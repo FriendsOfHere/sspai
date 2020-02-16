@@ -53,7 +53,7 @@ function updateData() {
 }
 
 function getUpdateFrequency() {
-    const DEFAULT_MIN_FREQUENCY = 30
+    const DEFAULT_MIN_FREQUENCY = 2
     const DEFAULT_MAX_FREQUENCY = 48
 
     let updateFenquency = _.toSafeInteger(pref.get("update-frequency"))
@@ -75,7 +75,7 @@ function getFetchArticleNum() {
 here.onLoad(() => {
     console.log("开始更新数据")
     updateData()
-    setInterval(updateData, getUpdateFrequency() * 1000);
+    setInterval(updateData, getUpdateFrequency() * 3600 * 1000);
 })
 
 let type = net.effectiveType;
