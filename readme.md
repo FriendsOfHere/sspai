@@ -15,8 +15,8 @@
 - [x] 支持获取 matrix 内容
 - [x] 支持设置抓取文章条数
 - [x] 支持设置更新频率
-- [] 支持配置多频道获取内容
-- [] 缓存已读内容
+- [ ] 支持配置多频道获取内容
+- [ ] 缓存已读内容
 
 ## License
 All plugins are published under the [MIT License](https://opensource.org/licenses/mit-license.php)
