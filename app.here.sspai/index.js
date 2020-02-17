@@ -100,7 +100,7 @@ function updateData() {
 }
 
 here.onLoad(() => {
-    //DEBUG notify
+    //DEBUG mode notify
     if (isDebugMode()) {
         let identifier = here.pluginIdentifier()
         here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
