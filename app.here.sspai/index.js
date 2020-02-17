@@ -28,23 +28,24 @@ function updateData() {
         } else {
             readIds = JSON.parse(readIds);
         }
-        console.log(JSON.stringify(readIds))
+        console.log("cachedIDs:" + JSON.stringify(readIds))
 
-        const topFeed = feed.items[0]
-        const unreadNum = _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link))).length
-        const nomoreFlag = unreadNum == 0
+        const unreadFeeds = _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link)))
+        const topFeed = _.head(unreadFeeds)
+
+        console.log(`topFeed: ${topFeed}`)
 
         // Mini Window
         here.setMiniWindow({
-            onClick: () => { if (topFeed.link != undefined && !nomoreFlag)  { here.openURL(topFeed.link) } },
-            title: nomoreFlag ? '暂无最新文章' : topFeed.title,
+            onClick: () => { 
+                if (topFeed != undefined && topFeed.link != undefined)  { here.openURL(topFeed.link) } 
+            },
+            title: topFeed == undefined ? '暂无最新文章' : topFeed.title,
             detail: "少数派文章更新",
             accessory: {
-                badge: unreadNum + ""
+                badge: unreadFeeds.length + ""
             },
-            popOvers: _.chain(feed.items)
-            .filter((item, index) => !_.includes(readIds, getPostId(item.link)))
-            .map((item, index) => {
+            popOvers: _.map(unreadFeeds,(item, index) => {
                 return {
                     title: isDebugMode() ? `${index + 1}. ${item.title} PID:` + getPostId(item.link) : `${index + 1}. ${item.title}`,
                     onClick: () => {
@@ -70,7 +71,6 @@ function updateData() {
                     },
                 }
             })
-            .value()
         })
 
         here.onPopOverAppear(() => {
