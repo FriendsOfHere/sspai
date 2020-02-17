@@ -1,6 +1,7 @@
 const pref = require("pref")
 const _ = require("lodash")
 const net = require("net")
+const cache = require('cache')
 
 function updateData() {
     const LIMIT = getFetchArticleNum()
@@ -20,6 +21,16 @@ function updateData() {
         // console.log(JSON.stringify(feed.items[0]));
 
         const topFeed = feed.items[0]
+        let readIds = cache.get('readIds');
+        if (readIds == undefined) {
+            console.log("未读列表缓存初始化")
+            readIds = [];
+        } else {
+            readIds = JSON.parse(readIds);
+        }
+        console.log(typeof readIds)
+        console.log(JSON.stringify(readIds))
+
         // Mini Window
         here.setMiniWindow({
             onClick: () => { if (topFeed.link != undefined)  { here.openURL(topFeed.link) } },
@@ -29,12 +40,28 @@ function updateData() {
                 badge: `${feed.items.length}`
             },
             popOvers: _.map(feed.items, (item, index) => {
+                var aa = _.last(_.split(item.link, '/'))
                 return {
-                    title: `${index + 1}. ${item.title}`,
+                    title: `${index + 1}. ${item.title} . ${aa}`,
                     onClick: () => {
                         if (item.link != undefined) {
-                            //TODO cache read item
-                            here.openURL(item.link)
+                            // 目前 here 缓存用法类似全局持久化，重启 here 或者 reload 之后缓存不会消失
+                            // cache post_id
+                            // https://sspai.com/post/58856
+                            // console.log(cache.get('read_ids'))
+                            // console.log(JSON.stringify(cache.get('read_ids')))
+                            let postId = _.last(_.split(item.link, '/'))
+                            //filter already cached postId
+                            if (_.indexOf(readIds, postId) == -1) {
+                                console.log(`cache postId:${postId}`)
+                                readIds.push(postId)
+                                console.log(JSON.stringify(readIds))
+                                cache.set('readIds', readIds);
+                            } else {
+                                console.log(`cacheExists:${postId} skip`)
+                            }
+
+                            // here.openURL(item.link)
                         }
                     },
                 }
@@ -73,6 +100,10 @@ function getFetchArticleNum() {
 }
 
 here.onLoad(() => {
+    //just for debug
+    console.log('清除缓存')
+    cache.removeAll()
+
     console.log("开始更新数据")
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);
