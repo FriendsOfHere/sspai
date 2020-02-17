@@ -39,6 +39,16 @@
               "Matrix",
               "首页推荐(暂未支持)",
           ]
+      },
+      {
+          "title": "DEBUG模式",
+          "type": "popup",
+          "key": "debug-mode",
+          "default": 0,
+          "options": [
+              "关闭",
+              "开启",
+          ]
       }
    ]
 }

@@ -40,13 +40,11 @@ function updateData() {
             accessory: {
                 badge: `${feed.items.length}`
             },
-
             popOvers: _.chain(feed.items)
             .filter((item, index) => !_.includes(readIds, getPostId(item.link)))
             .map((item, index) => {
-                var aa = getPostId(item.link)
                 return {
-                    title: `${index + 1}. ${item.title} . ${aa}`,
+                    title: isDebugMode() ? `${index + 1}. ${item.title} PID:` + getPostId(item.link) : `${index + 1}. ${item.title}`,
                     onClick: () => {
                         if (item.link != undefined) {
                             // 目前 here 缓存用法类似全局持久化，重启 here 或者 reload 之后缓存不会消失
@@ -119,11 +117,22 @@ function getFetchArticleNum() {
     return PAGE_MAP[_.toSafeInteger(pref.get("article-num"))]
 }
 
-here.onLoad(() => {
-    //just for debug
-    // console.log('清除缓存')
-    // cache.removeAll()
+function isDebugMode() {
+    return _.toSafeInteger(pref.get("debug-mode")) == 1
+}
 
+here.onLoad(() => {
+    //DEBUG notify
+    if (isDebugMode()) {
+        let identifier = here.pluginIdentifier()
+        here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
+1. 每次重启或者 reload，缓存会清空
+2. 帖子标题增加 POST_ID 方便追溯
+`)
+        console.log('清除全部缓存')
+        cache.removeAll()
+    }
+    
     console.log("开始更新数据")
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);
