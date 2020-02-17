@@ -20,8 +20,8 @@ function updateData() {
             feed.items = feed.items.slice(0, LIMIT)
         }
 
-        // Mini Window
-        let renderMiniwindow = () => {
+        // render component
+        let renderComponent = () => {
             // console.log(JSON.stringify(feed.items[0]));
             let readIds = cache.get('readIds');
             if (readIds == undefined) {
@@ -63,28 +63,33 @@ function updateData() {
                                     console.log(`cacheExists:${postId} skip`)
                                 }
 
-                                here.openURL(item.link)
+                                //here.openURL(item.link)
                             }
                         },
                     }
                 })
             })
 
+            //未读消息 各个组件同步更新
+            here.setMenuBar({
+              title: `SSPAI 未读数(${unreadFeeds.length})`
+            })
+
+            here.setDock({
+                title: unreadFeeds.length.toString(),
+                detail: "少数派更新"
+            })
         }
 
-        console.log("render miniwindow start...")
-        renderMiniwindow()
+        console.log("render component start...")
+        renderComponent()
 
-        //移出 popup 的时候 重绘 miniwindow，当前 here 不支持 partial render
+        //移出 popup 的时候 重绘各个组件数据，当前 here 不支持 partial render
         here.onPopOverDisappear(() => {
             console.log("onPopOverDisappear")
-            console.log("rerender miniwindow start")
-            renderMiniwindow()
+            console.log("rerender component start")
+            renderComponent()
         })
-
-        //dock TODO
-
-        //menubar TODO
     })
     .catch((error) => {
         console.error(`Error: ${JSON.stringify(error)}`)

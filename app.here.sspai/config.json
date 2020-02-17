@@ -11,6 +11,8 @@
    "defaultCategory": "News",
    "displayOn": [
       "mini",
+      "menuBar",
+      "dock"
    ],
    "preferences": [
       {
