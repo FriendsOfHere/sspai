@@ -28,11 +28,11 @@ function updateData() {
         } else {
             readIds = JSON.parse(readIds);
         }
-        console.log(typeof readIds)
         console.log(JSON.stringify(readIds))
 
         const topFeed = feed.items[0]
-        const nomoreFlag = _.includes(readIds, getPostId(topFeed.link))
+        const unreadNum = _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link))).length
+        const nomoreFlag = unreadNum == 0
 
         // Mini Window
         here.setMiniWindow({
@@ -40,7 +40,7 @@ function updateData() {
             title: nomoreFlag ? '暂无最新文章' : topFeed.title,
             detail: "少数派文章更新",
             accessory: {
-                badge: _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link))).length + ""
+                badge: unreadNum + ""
             },
             popOvers: _.chain(feed.items)
             .filter((item, index) => !_.includes(readIds, getPostId(item.link)))
