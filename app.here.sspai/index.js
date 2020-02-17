@@ -3,6 +3,10 @@ const _ = require("lodash")
 const net = require("net")
 const cache = require('cache')
 
+function getPostId(postLink) {
+    return postLink == undefined ? '' : _.last(_.split(postLink, '/'))
+}
+
 function updateData() {
     const LIMIT = getFetchArticleNum()
     console.log("获取更新文章数:" + LIMIT)
@@ -39,8 +43,11 @@ function updateData() {
             accessory: {
                 badge: `${feed.items.length}`
             },
-            popOvers: _.map(feed.items, (item, index) => {
-                var aa = _.last(_.split(item.link, '/'))
+
+            popOvers: _.chain(feed.items)
+            .filter((item, index) => !_.includes(readIds, getPostId(item.link)))
+            .map((item, index) => {
+                var aa = getPostId(item.link)
                 return {
                     title: `${index + 1}. ${item.title} . ${aa}`,
                     onClick: () => {
@@ -50,7 +57,7 @@ function updateData() {
                             // https://sspai.com/post/58856
                             // console.log(cache.get('read_ids'))
                             // console.log(JSON.stringify(cache.get('read_ids')))
-                            let postId = _.last(_.split(item.link, '/'))
+                            let postId = getPostId(item.link)
                             //filter already cached postId
                             if (_.indexOf(readIds, postId) == -1) {
                                 console.log(`cache postId:${postId}`)
@@ -66,7 +73,23 @@ function updateData() {
                     },
                 }
             })
+            .value()
         })
+
+        here.onPopOverAppear(() => {
+            console.log("onPopOverAppear")
+        })
+
+        //移出 popup 的时候 更新未读数量
+        here.onPopOverDisappear(() => {
+            console.log("onPopOverDisappear")
+            // here.setMiniWindow({
+            //     accessory: {
+            //         badge: '小猫咪'
+            //     },
+            // })
+        })
+
 
         //dock TODO
 
