@@ -43,6 +43,16 @@
           ]
       },
       {
+          "title": "未读消息提醒",
+          "type": "popup",
+          "key": "unread-notify",
+          "default": 0,
+          "options": [
+              "关闭",
+              "开启",
+          ]
+      },
+      {
           "title": "DEBUG模式",
           "type": "popup",
           "key": "debug-mode",

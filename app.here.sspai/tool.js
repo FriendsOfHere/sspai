@@ -19,6 +19,9 @@ module.exports = {
     },
     isDebugMode: () => {
         return _.toSafeInteger(pref.get("debug-mode")) == 1
+    },
+    isUnreadNotifyOpen: () => {
+        return _.toSafeInteger(pref.get("unread-notify")) == 1
     }
 }
 

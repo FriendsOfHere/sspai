@@ -2,8 +2,8 @@ const pref = require("pref")
 const _ = require("lodash")
 const net = require("net")
 const cache = require('cache')
-const {getPostId} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, isDebugMode} = require('./tool.js')
+const {getPostId, getUnreadFeeds} = require('./sspai.js')
+const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen} = require('./tool.js')
 
 function updateData() {
     const LIMIT = getFetchArticleNum()
@@ -20,17 +20,37 @@ function updateData() {
             feed.items = feed.items.slice(0, LIMIT)
         }
 
+        //init cache read list
+        let cachedPostIds = cache.get('readIds');
+        if (cachedPostIds == undefined) {
+            console.log("已读列表缓存初始化")
+            cache.set('readIds', []);
+        } else {
+            cachedPostIds = JSON.parse(cachedPostIds);
+            const checkUnreadFeedsNum = getUnreadFeeds(feed.items, cachedPostIds).length
+
+            //unread notify
+            if (checkUnreadFeedsNum > 0 && isUnreadNotifyOpen()) {
+                //debug 模式下，有 debug 通知，避免两个通知干扰，延时通知此消息
+                _.delay((unreadNum) => {
+                    here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
+                }, isDebugMode() ? 5000 : 1000);
+            }
+        }
+
         // render component
         let renderComponent = () => {
             // console.log(JSON.stringify(feed.items[0]));
             let readIds = cache.get('readIds');
             if (readIds == undefined) {
                 console.log("已读列表缓存初始化")
-                readIds = [];
+                readIds = []
             } else {
                 readIds = JSON.parse(readIds);
             }
             console.log("cachedIDs:" + JSON.stringify(readIds))
+
+            //console.log(JSON.stringify(getUnreadFeeds(feed.items, readIds)))
 
             let unreadFeeds = _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link)))
             let topFeed = _.head(unreadFeeds)
@@ -107,7 +127,7 @@ here.onLoad(() => {
 2. 帖子标题增加 POST_ID 方便追溯
 `)
         console.log('清除全部缓存')
-        cache.removeAll()
+        // cache.removeAll()
     }
     
     console.log("开始更新数据")
