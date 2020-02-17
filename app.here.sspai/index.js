@@ -25,7 +25,7 @@ function updateData() {
             // console.log(JSON.stringify(feed.items[0]));
             let readIds = cache.get('readIds');
             if (readIds == undefined) {
-                console.log("未读列表缓存初始化")
+                console.log("已读列表缓存初始化")
                 readIds = [];
             } else {
                 readIds = JSON.parse(readIds);
@@ -74,10 +74,6 @@ function updateData() {
 
         console.log("render miniwindow start...")
         renderMiniwindow()
-
-        here.onPopOverAppear(() => {
-            console.log("onPopOverAppear")
-        })
 
         //移出 popup 的时候 重绘 miniwindow，当前 here 不支持 partial render
         here.onPopOverDisappear(() => {
