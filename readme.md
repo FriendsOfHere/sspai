@@ -6,7 +6,7 @@
 
 ## Installation
 
-### Use .hereplugin
+### 👉 Use .hereplugin (Recommend)
 1. go [releases](https://github.com/lifesign/here-plugin-sspai/releases) page
 2. download the latest release & double click the `app.here.sspai.hereplugin`
 
