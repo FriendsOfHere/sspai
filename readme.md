@@ -21,8 +21,13 @@
 - [x] 支持获取 matrix 内容
 - [x] 支持设置抓取文章条数
 - [x] 支持设置更新频率
-- [ ] 支持配置多频道获取内容
 - [ ] 缓存已读内容
+- [ ] dock、menubar 支持未读数提醒
+- [ ] 配置新未读消息提醒
+- [ ] 支持配置快捷键绑定
+- [ ] 支持配置展示/隐藏已读内容
+- [ ] 支持配置多频道获取内容
+- [ ] 筛选频道支持 checkbox 配置，用于选择多个源 (here 官方目前 checkbox 有问题，暂缓)
 
 ## License
 All plugins are published under the [MIT License](https://opensource.org/licenses/mit-license.php)
