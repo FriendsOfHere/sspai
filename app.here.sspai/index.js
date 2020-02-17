@@ -32,13 +32,14 @@ function updateData() {
 
         const topFeed = feed.items[0]
         const nomoreFlag = _.includes(readIds, getPostId(topFeed.link))
+
         // Mini Window
         here.setMiniWindow({
             onClick: () => { if (topFeed.link != undefined && !nomoreFlag)  { here.openURL(topFeed.link) } },
             title: nomoreFlag ? '暂无最新文章' : topFeed.title,
             detail: "少数派文章更新",
             accessory: {
-                badge: `${feed.items.length}`
+                badge: _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link))).length + ""
             },
             popOvers: _.chain(feed.items)
             .filter((item, index) => !_.includes(readIds, getPostId(item.link)))
