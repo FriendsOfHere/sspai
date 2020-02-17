@@ -2,10 +2,7 @@ const pref = require("pref")
 const _ = require("lodash")
 const net = require("net")
 const cache = require('cache')
-
-function getPostId(postLink) {
-    return postLink == undefined ? '' : _.last(_.split(postLink, '/'))
-}
+const {getPostId} = require('./sspai.js')
 
 function updateData() {
     const LIMIT = getFetchArticleNum()
