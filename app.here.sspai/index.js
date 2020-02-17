@@ -23,8 +23,6 @@ function updateData() {
         }
 
         // console.log(JSON.stringify(feed.items[0]));
-
-        const topFeed = feed.items[0]
         let readIds = cache.get('readIds');
         if (readIds == undefined) {
             console.log("未读列表缓存初始化")
@@ -35,10 +33,12 @@ function updateData() {
         console.log(typeof readIds)
         console.log(JSON.stringify(readIds))
 
+        const topFeed = feed.items[0]
+        const nomoreFlag = _.includes(readIds, getPostId(topFeed.link))
         // Mini Window
         here.setMiniWindow({
-            onClick: () => { if (topFeed.link != undefined)  { here.openURL(topFeed.link) } },
-            title: topFeed.title,
+            onClick: () => { if (topFeed.link != undefined && !nomoreFlag)  { here.openURL(topFeed.link) } },
+            title: nomoreFlag ? '暂无最新文章' : topFeed.title,
             detail: "少数派文章更新",
             accessory: {
                 badge: `${feed.items.length}`
@@ -124,8 +124,8 @@ function getFetchArticleNum() {
 
 here.onLoad(() => {
     //just for debug
-    console.log('清除缓存')
-    cache.removeAll()
+    // console.log('清除缓存')
+    // cache.removeAll()
 
     console.log("开始更新数据")
     updateData()
