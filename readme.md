@@ -6,15 +6,15 @@
 
 ## Installation
 
-### Use hereplugin
+### Use .hereplugin
 1. go [releases](https://github.com/lifesign/here-plugin-sspai/releases) page
-2. download the latest release & Double click the `app.here.sspai.hereplugin`
+2. download the latest release & double click the `app.here.sspai.hereplugin`
 
 ### Manually
 ```
 1. git clone git@github.com:lifesign/here-plugin-sspai.git .
-2. cd here-plugin-sspai && ln -s ./app.here.sspai /Users/{yourName}/Library/Application Support/app.here/plugins/app.here.sspai
-3. restart `here` or use Debug console reload all
+2. cd here-plugin-sspai && ln -s $(pwd)/app.here.sspai/ /Users/{yourName}/Library/Application Support/app.here/plugins/app.here.sspai
+3. restart `here` or click reload all in `Debug console`
 ```
 
 ## Roadmap
