@@ -63,7 +63,7 @@ function updateData() {
                                     console.log(`cacheExists:${postId} skip`)
                                 }
 
-                                // here.openURL(item.link)
+                                here.openURL(item.link)
                             }
                         },
                     }
