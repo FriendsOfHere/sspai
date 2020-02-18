@@ -13,7 +13,7 @@
 ### Manually
 ```
 1. git clone git@github.com:lifesign/here-plugin-sspai.git .
-2. cd here-plugin-sspai && ln -s $(pwd)/app.here.sspai/ /Users/{yourName}/Library/Application Support/app.here/plugins/app.here.sspai
+2. cd here-plugin-sspai && ln -s $(pwd)/app.here.sspai/ /Users/$(whoami)/Library/Application Support/app.here/plugins/app.here.sspai
 3. restart `here` or click reload all in `Debug console`
 ```
 
