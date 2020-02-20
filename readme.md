@@ -6,8 +6,8 @@
 
 ## Installation
 
-### 👉 One Click  (Recommend)
-<a href="https://jump.here.app/?installPlugin?title=sspai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/app.here.sspai.hereplugin">🔌</a>
+### One Click  (Recommend)
+👉 <a href="https://jump.here.app/?installPlugin?title=sspai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/app.here.sspai.hereplugin">Click Here 🔌</a>
 
 ### Manually
 1. go [releases](https://github.com/FriendsOfHere/sspai/releases/latest/) page
@@ -16,25 +16,25 @@
 ## Features
 - Show latest articles from sspai
 - Cache read articles
-- Custom Settings
-- Support debug mode, rigger by hotkey
+- Custom settings
+- Support debug mode, trigger by hotkey
 - Readable debug console log
-- Unread Notification
-- Dynamic unread num (Support mini window、menu bar、dock)
+- Unread notification
+- Dynamic unread num (mini window、menu bar、dock)
 
 ## Configurations
-1. Update frequency (time unit: h)
-2. Article fetch num (default: 10)
-3. Debug hotkey binding (default: cmd+F1)
-4. Unread notification (default: close)
-5. Article Channels (Matrix)
+1. Update frequency (time unit: **h**)
+2. Article fetch num (default: **10**)
+3. Debug hotkey binding (default: `cmd+F1`)
+4. Unread notification (default: **close**)
+5. Article channels (**Matrix**)
 
 ## Development
 
 ```console
 1. git clone git@github.com:FriendsOfHere/sspai.git .
 2. cd sspai && ln -s $(pwd)/app.here.sspai/ /Users/$(whoami)/Library/Application Support/app.here/plugins/app.here.sspai
-3. restart `here` or click reload all in `Debug console`
+3. restart `here` or click reload all in `debug console`
 ```
 
 ## Roadmap
