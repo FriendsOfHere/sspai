@@ -9,7 +9,7 @@ module.exports = {
             return DEFAULT_MIN_FREQUENCY
         }
 
-        console.log("[Read PREF] 更新频率:" + updateFenquency + "h")
+        debug("[Read PREF] 更新频率:" + updateFenquency + "h")
         return updateFenquency
     },
     getFetchArticleNum: () => {
@@ -25,6 +25,22 @@ module.exports = {
     },
     getDebugHotkey: () => {
         return pref.get("debug-hotkey")
+    },
+    debug: (log, isMainFlow = false, override = false) => {
+        let span = ""
+        if (!isMainFlow) {
+            // span = "    "
+            // span = "|----"
+            span = "|____"
+        } else {
+            span = "[MAIN]→ "
+        }
+
+        if (override) {
+            console.log(log)
+        } else {
+            console.log(`${span}${log}`)
+        }
     }
 }
 

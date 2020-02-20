@@ -5,11 +5,13 @@ const net = require("net")
 const pref = require("pref")
 
 const {getPostId, getUnreadFeeds} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen, getDebugHotkey} = require('./tool.js')
+const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
 
 function updateData() {
+    debug("开始更新数据", true)
+
     const LIMIT = getFetchArticleNum()
-    console.log(`[Read PREF] 更新文章数:${LIMIT}`)
+    debug(`[Read PREF] 更新文章数:${LIMIT}`)
 
     here.setMiniWindow({ title: "Fetching…" })
     here.parseRSSFeed('https://rsshub.app/sspai/matrix')
@@ -25,7 +27,7 @@ function updateData() {
         //init read list cache
         let cachedPostIds = cache.get('readIds');
         if (cachedPostIds == undefined) {
-            console.log("已读列表初始化缓存")
+            debug("🚀 已读列表初始化缓存")
             cache.set('readIds', []);
         } else {
             cachedPostIds = JSON.parse(cachedPostIds);
@@ -44,12 +46,12 @@ function updateData() {
         // render component
         let renderComponent = () => {
             let readIds = JSON.parse(cache.get('readIds'));
-            console.log("cachedIDs:" + JSON.stringify(readIds))
+            debug("cachedIDs:" + JSON.stringify(readIds))
 
             let unreadFeeds = getUnreadFeeds(feed.items, readIds)
             let topFeed = _.head(unreadFeeds)
 
-            console.log(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
+            debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
 
             here.setMiniWindow({
                 onClick: () => {
@@ -68,12 +70,12 @@ function updateData() {
                                 let postId = getPostId(item.link)
                                 //filter cached postId
                                 if (_.indexOf(readIds, postId) == -1) {
-                                    console.log(`cache postId:${postId}`)
+                                    debug(`cache postId:${postId}`)
                                     readIds.push(postId)
-                                    console.log(JSON.stringify(readIds))
+                                    debug(JSON.stringify(readIds))
                                     cache.set('readIds', readIds);
                                 } else {
-                                    console.log(`cacheExists:${postId} skip`)
+                                    debug(`cacheExists:${postId} skip`)
                                 }
 
                                 if (!isDebugMode()) {
@@ -97,13 +99,13 @@ function updateData() {
             })
         }
 
-        console.log("render component start...")
+        debug("Render component start...")
         renderComponent()
 
         //rerender component display, partial render is not supported for now
         here.onPopOverDisappear(() => {
-            console.log("onPopOverDisappear")
-            console.log("rerender component start")
+            debug("onPopOverDisappear")
+            debug("____Rerender component start")
             renderComponent()
         })
     })
@@ -121,7 +123,7 @@ function initDebugHotKey() {
     let hotkeySetting = getDebugHotkey();
     if (hotkeySetting == "") return
 
-    console.log(`[Read PREF] Hotkey: ${hotkeySetting}`)
+    debug(`[Read PREF] Hotkey: ${hotkeySetting}`)
 
     if (!hotkey.assignable(hotkeySetting.split("+"))) {
         here.systemNotification(`【🐞DEBUG热键{${hotkeySetting}} 已绑定其他快捷键】`, "请重新设定或者清空绑定")
@@ -129,13 +131,15 @@ function initDebugHotKey() {
     }
 
     let bindResult = hotkey.bind(hotkeySetting.split("+"), () => {
-        console.log(`debug hotkey toggle before: ${cache.get('debug-hotkey-switch')}`)
+        debug('|DEBUG_MODE CHANGED|', false, true)
+        debug(`Before: ${cache.get('debug-hotkey-switch')}`)
         //Toggle Debug hotkey, implement use a simple cache switch
         const debugSwitch = cache.get('debug-hotkey-switch')
         const identifier = here.pluginIdentifier()
         if (debugSwitch != undefined && _.toSafeInteger(debugSwitch) == 1) {
             here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 已关闭 DEBUG 模式`)
             cache.set('debug-hotkey-switch', 0)
+            debug('After: 0')
         } else {
         here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
 1. 每次重启或者 reload，缓存会清空
@@ -144,12 +148,14 @@ function initDebugHotKey() {
             cache.removeAll()
             //ensure debug switch exists
             cache.set('debug-hotkey-switch', 1)
+            debug('After: 1')
         }
         //rerender
+        debug('Rerender component start')
         updateData()
     })
 
-    console.log(`Debug hotkey bindResult: ${bindResult}`)
+    debug(`Debug hotkey bindResult: ${bindResult}`)
 }
 
 
@@ -160,14 +166,13 @@ function initDebugHotKey() {
  * - reload plugin in Debug Console
  */
 here.onLoad(() => {
-
-    //init DEBUG feature
-    initDebugHotKey();
-
-
+    debug("========== Plugin Debug Info Start ==========", false, true)
+    debug("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓", false, true)
     //main flow
-    console.log(`[DEBUG_MODE] ${isDebugMode()}`)
-    console.log("开始更新数据")
+    debug(`init debug feature`, true)
+    initDebugHotKey();
+    debug(`[DEBUG_MODE] ${isDebugMode()}`)
+
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);
 })
