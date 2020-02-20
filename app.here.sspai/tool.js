@@ -9,7 +9,7 @@ module.exports = {
             return DEFAULT_MIN_FREQUENCY
         }
 
-        console.log("获取更新频率:" + updateFenquency + "h")
+        debug("[Read PREF] 更新频率:" + updateFenquency + "h")
         return updateFenquency
     },
     getFetchArticleNum: () => {
@@ -18,7 +18,29 @@ module.exports = {
         return PAGE_MAP[_.toSafeInteger(pref.get("article-num"))]
     },
     isDebugMode: () => {
-        return _.toSafeInteger(pref.get("debug-mode")) == 1
+        return _.toSafeInteger(cache.get("debug-hotkey-switch")) == 1
+    },
+    isUnreadNotifyOpen: () => {
+        return _.toSafeInteger(pref.get("unread-notify")) == 1
+    },
+    getDebugHotkey: () => {
+        return pref.get("debug-hotkey")
+    },
+    debug: (log, isMainFlow = false, override = false) => {
+        let span = ""
+        if (!isMainFlow) {
+            // span = "    "
+            // span = "|----"
+            span = "|____"
+        } else {
+            span = "[MAIN]→ "
+        }
+
+        if (override) {
+            console.log(log)
+        } else {
+            console.log(`${span}${log}`)
+        }
     }
 }
 
