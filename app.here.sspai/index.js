@@ -7,10 +7,9 @@ const pref = require("pref")
 const {getPostId, getUnreadFeeds} = require('./sspai.js')
 const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen, getDebugHotkey} = require('./tool.js')
 
-
 function updateData() {
     const LIMIT = getFetchArticleNum()
-    console.log("获取更新文章数:" + LIMIT)
+    console.log(`[Read PREF] 更新文章数:${LIMIT}`)
 
     here.setMiniWindow({ title: "Fetching…" })
     here.parseRSSFeed('https://rsshub.app/sspai/matrix')
@@ -23,10 +22,10 @@ function updateData() {
             feed.items = feed.items.slice(0, LIMIT)
         }
 
-        //init cache read list
+        //init read list cache
         let cachedPostIds = cache.get('readIds');
         if (cachedPostIds == undefined) {
-            console.log("已读列表缓存初始化")
+            console.log("已读列表初始化缓存")
             cache.set('readIds', []);
         } else {
             cachedPostIds = JSON.parse(cachedPostIds);
@@ -34,7 +33,8 @@ function updateData() {
 
             //unread notify
             if (checkUnreadFeedsNum > 0 && isUnreadNotifyOpen()) {
-                //debug 模式下，有 debug 通知，避免两个通知干扰，延时通知此消息
+                //when in debug mode, system notifications will be conflicted
+                //delay the unread notification for seconds later
                 _.delay((unreadNum) => {
                     here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
                 }, isDebugMode() ? 5000 : 1000);
@@ -43,22 +43,13 @@ function updateData() {
 
         // render component
         let renderComponent = () => {
-            // console.log(JSON.stringify(feed.items[0]));
-            let readIds = cache.get('readIds');
-            if (readIds == undefined) {
-                console.log("已读列表缓存初始化")
-                readIds = []
-            } else {
-                readIds = JSON.parse(readIds);
-            }
+            let readIds = JSON.parse(cache.get('readIds'));
             console.log("cachedIDs:" + JSON.stringify(readIds))
 
-            //console.log(JSON.stringify(getUnreadFeeds(feed.items, readIds)))
-
-            let unreadFeeds = _.filter(feed.items, (item, index) => !_.includes(readIds, getPostId(item.link)))
+            let unreadFeeds = getUnreadFeeds(feed.items, readIds)
             let topFeed = _.head(unreadFeeds)
 
-            console.log(`topFeed: ${topFeed}`)
+            console.log(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
 
             here.setMiniWindow({
                 onClick: () => {
@@ -71,10 +62,9 @@ function updateData() {
                 },
                 popOvers: _.map(unreadFeeds,(item, index) => {
                     return {
-                        title: isDebugMode() ? `${index + 1}. ${item.title} PID:` + getPostId(item.link) : `${index + 1}. ${item.title}`,
+                        title: isDebugMode() ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}` : `${index + 1}. ${item.title}`,
                         onClick: () => {
                             if (item.link != undefined) {
-                                // 目前 here 缓存用法类似全局持久化，重启 here 或者 reload 之后缓存不会消失
                                 let postId = getPostId(item.link)
                                 //filter cached postId
                                 if (_.indexOf(readIds, postId) == -1) {
@@ -86,18 +76,21 @@ function updateData() {
                                     console.log(`cacheExists:${postId} skip`)
                                 }
 
-                                //here.openURL(item.link)
+                                if (!isDebugMode()) {
+                                    here.openURL(item.link)
+                                }
                             }
                         },
                     }
                 })
             })
 
-            //未读消息 各个组件同步更新
+            // menu bar component display
             here.setMenuBar({
               title: `SSPAI 未读数(${unreadFeeds.length})`
             })
 
+            //dock component display
             here.setDock({
                 title: unreadFeeds.length.toString(),
                 detail: "少数派更新"
@@ -107,7 +100,7 @@ function updateData() {
         console.log("render component start...")
         renderComponent()
 
-        //移出 popup 的时候 重绘各个组件数据，当前 here 不支持 partial render
+        //rerender component display, partial render is not supported for now
         here.onPopOverDisappear(() => {
             console.log("onPopOverDisappear")
             console.log("rerender component start")
@@ -116,7 +109,7 @@ function updateData() {
     })
     .catch((error) => {
         console.error(`Error: ${JSON.stringify(error)}`)
-        //TODO 打断重试，暂时不支持
+        //TODO interrupt retry ，api not supported
         here.setMiniWindow({ title: "Fetching Failed..." })
     })
 }
@@ -128,7 +121,7 @@ function initDebugHotKey() {
     let hotkeySetting = getDebugHotkey();
     if (hotkeySetting == "") return
 
-    console.log(`Hotkey Pref: ${hotkeySetting}`)
+    console.log(`[Read PREF] Hotkey: ${hotkeySetting}`)
 
     if (!hotkey.assignable(hotkeySetting.split("+"))) {
         here.systemNotification(`【🐞DEBUG热键{${hotkeySetting}} 已绑定其他快捷键】`, "请重新设定或者清空绑定")
@@ -171,7 +164,9 @@ here.onLoad(() => {
     //init DEBUG feature
     initDebugHotKey();
 
+
     //main flow
+    console.log(`[DEBUG_MODE] ${isDebugMode()}`)
     console.log("开始更新数据")
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);

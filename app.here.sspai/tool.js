@@ -9,7 +9,7 @@ module.exports = {
             return DEFAULT_MIN_FREQUENCY
         }
 
-        console.log("获取更新频率:" + updateFenquency + "h")
+        console.log("[Read PREF] 更新频率:" + updateFenquency + "h")
         return updateFenquency
     },
     getFetchArticleNum: () => {
