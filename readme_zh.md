@@ -2,7 +2,7 @@
 
 ![Jietu20200216-191022@2x.png](https://i.loli.net/2020/02/16/svhqUfegDZF5acb.png)
 
-> 一个高度配置化的 [here](https://here.app/) [少数派](http://sspai.com/) 插件
+> 一个高度配置化的 [here](https://here.app/) 插件，专为 [少数派](http://sspai.com/) 设计
 
 ## 安装
 
@@ -18,7 +18,7 @@
 - 不显示已读文章
 - 自定义的配置项
 - 支持 debug 模式，热键切换
-- 友好的 debug console 日志展示
+- 友好的 `debug console` 日志展示
 - 未读文章提醒
 - 动态刷新未读数 (支持 mini window、menu bar、dock)
 

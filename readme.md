@@ -17,7 +17,7 @@
 
 ## Features
 - Show latest articles from sspai
-- Cache read articles
+- Filter read articles
 - Custom settings
 - Support debug mode, trigger by hotkey
 - Readable debug console log
