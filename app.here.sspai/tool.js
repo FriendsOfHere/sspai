@@ -18,10 +18,13 @@ module.exports = {
         return PAGE_MAP[_.toSafeInteger(pref.get("article-num"))]
     },
     isDebugMode: () => {
-        return _.toSafeInteger(pref.get("debug-mode")) == 1
+        return _.toSafeInteger(cache.get("debug-hotkey-switch")) == 1
     },
     isUnreadNotifyOpen: () => {
         return _.toSafeInteger(pref.get("unread-notify")) == 1
+    },
+    getDebugHotkey: () => {
+        return pref.get("debug-hotkey")
     }
 }
 

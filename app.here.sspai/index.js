@@ -1,9 +1,12 @@
-const pref = require("pref")
 const _ = require("lodash")
-const net = require("net")
 const cache = require('cache')
+const hotkey = require('hotkey')
+const net = require("net")
+const pref = require("pref")
+
 const {getPostId, getUnreadFeeds} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen} = require('./tool.js')
+const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen, getDebugHotkey} = require('./tool.js')
+
 
 function updateData() {
     const LIMIT = getFetchArticleNum()
@@ -61,7 +64,7 @@ function updateData() {
                 onClick: () => {
                     if (topFeed != undefined && topFeed.link != undefined)  { here.openURL(topFeed.link) }
                 },
-                title: topFeed == undefined ? '暂无最新文章' : topFeed.title,
+                title: topFeed == undefined ? '暂无最新文章' : `${isDebugMode() ? "🐞" : ""}${topFeed.title}`,
                 detail: "少数派文章更新",
                 accessory: {
                     badge: unreadFeeds.length + ""
@@ -118,18 +121,57 @@ function updateData() {
     })
 }
 
-here.onLoad(() => {
-    //DEBUG mode notify
-    if (isDebugMode()) {
-        let identifier = here.pluginIdentifier()
+function initDebugHotKey() {
+    //ensure debug switch was initialized closed on every onLoad
+    cache.set('debug-hotkey-switch', 0)
+
+    let hotkeySetting = getDebugHotkey();
+    if (hotkeySetting == "") return
+
+    console.log(`Hotkey Pref: ${hotkeySetting}`)
+
+    if (!hotkey.assignable(hotkeySetting.split("+"))) {
+        here.systemNotification(`【🐞DEBUG热键{${hotkeySetting}} 已绑定其他快捷键】`, "请重新设定或者清空绑定")
+        return
+    }
+
+    let bindResult = hotkey.bind(hotkeySetting.split("+"), () => {
+        console.log(`debug hotkey toggle before: ${cache.get('debug-hotkey-switch')}`)
+        //Toggle Debug hotkey, implement use a simple cache switch
+        const debugSwitch = cache.get('debug-hotkey-switch')
+        const identifier = here.pluginIdentifier()
+        if (debugSwitch != undefined && _.toSafeInteger(debugSwitch) == 1) {
+            here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 已关闭 DEBUG 模式`)
+            cache.set('debug-hotkey-switch', 0)
+        } else {
         here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
 1. 每次重启或者 reload，缓存会清空
 2. 帖子标题增加 POST_ID 方便追溯
 `)
-        console.log('清除全部缓存')
-        // cache.removeAll()
-    }
-    
+            cache.removeAll()
+            //ensure debug switch exists
+            cache.set('debug-hotkey-switch', 1)
+        }
+        //rerender
+        updateData()
+    })
+
+    console.log(`Debug hotkey bindResult: ${bindResult}`)
+}
+
+
+/**
+ * onLoad will be called in below scenes
+ * - restart here
+ * - save plugin pref
+ * - reload plugin in Debug Console
+ */
+here.onLoad(() => {
+
+    //init DEBUG feature
+    initDebugHotKey();
+
+    //main flow
     console.log("开始更新数据")
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);

@@ -53,14 +53,10 @@
           ]
       },
       {
-          "title": "DEBUG模式",
-          "type": "popup",
-          "key": "debug-mode",
-          "default": 0,
-          "options": [
-              "关闭",
-              "开启",
-          ]
+          "title": "DEBUG 快捷键",
+          "type": "text",
+          "key": "debug-hotkey",
+          "default": "cmd+F1",
       }
    ]
 }
