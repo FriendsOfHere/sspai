@@ -5,7 +5,7 @@
    "identifier": "app.here.sspai",
    "createdBy": "Lifesign",
    "icon": "icon.png",
-   "website": "https://github.com/lifesign/here-plugin-sspai",
+   "website": "https://github.com/FriendsOfHere/sspai",
    "appcast": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/app.here.sspai/appcast.xml",
    "script": "index.js",
    "defaultCategory": "News",
