@@ -9,11 +9,11 @@
 ## Installation
 
 ### One Click  (Recommend)
-👉 <a href="https://jump.here.app/?installPlugin?title=sspai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/app.here.sspai.hereplugin">Click Here 🔌</a>
+👉 <a href="https://jump.here.app/?installPlugin?title=SSPai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/SSPai.hereplugin">Click Here 🔌</a>
 
 ### Manually
-1. go [releases](https://github.com/FriendsOfHere/sspai/releases/latest/) page
-2. download the latest release & double click the `app.here.sspai.hereplugin`
+1. Go [releases](https://github.com/FriendsOfHere/sspai/releases/latest/) page
+2. Download the latest release & double click the `SSPai.hereplugin`
 
 ## Features
 - Show latest articles from sspai
@@ -35,7 +35,7 @@
 
 ```console
 1. git clone git@github.com:FriendsOfHere/sspai.git .
-2. cd sspai && ln -s $(pwd)/app.here.sspai/ /Users/$(whoami)/Library/Application Support/app.here/plugins/app.here.sspai
+2. cd sspai && ln -s $(pwd)/src/ /Users/$(whoami)/Library/Application Support/app.here/plugins/foh.sspai
 3. restart `here` or click reload all in `debug console`
 ```
 

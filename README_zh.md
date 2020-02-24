@@ -7,11 +7,11 @@
 ## 安装
 
 ### 一键安装  (推荐)
-👉 <a href="https://jump.here.app/?installPlugin?title=sspai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/app.here.sspai.hereplugin">点击这里 🔌</a>
+👉 <a href="https://jump.here.app/?installPlugin?title=SSPai&url=https://github.com/FriendsOfHere/sspai/releases/latest/download/SSPai.hereplugin">点击这里 🔌</a>
 
 ### 手动安装
 1. 打开 [releases](https://github.com/FriendsOfHere/sspai/releases/latest/) 页面
-2. 下载最新的 release 版本，双击 `app.here.sspai.hereplugin` 即可安装
+2. 下载最新的 release 版本，双击 `SSPai.hereplugin` 即可安装
 
 ## 特性
 - 显示少数派最新文章
@@ -33,7 +33,7 @@
 
 ```console
 1. git clone git@github.com:FriendsOfHere/sspai.git .
-2. cd sspai && ln -s $(pwd)/app.here.sspai/ /Users/$(whoami)/Library/Application Support/app.here/plugins/app.here.sspai
+2. cd sspai && ln -s $(pwd)/src/ /Users/$(whoami)/Library/Application Support/app.here/plugins/foh.sspai
 3. restart `here` or click reload all in `debug console`
 ```
 
