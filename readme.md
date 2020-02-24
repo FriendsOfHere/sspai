@@ -4,7 +4,7 @@
 
 > A highly configurable [here](https://here.app/) plugin for [sspai](http://sspai.com/).
 
-[中文说明](./readme_zh.md)
+[中文说明](./README_zh.md)
 
 ## Installation
 
