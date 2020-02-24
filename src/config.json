@@ -1,12 +1,12 @@
 {
    "name": "SSPai",
-   "version": "1.2.0",
+   "version": "1.2.1",
    "description": "Show latest articles from sspai.com",
-   "identifier": "app.here.sspai",
+   "identifier": "foh.sspai",
    "createdBy": "Lifesign",
    "icon": "icon.png",
    "website": "https://github.com/FriendsOfHere/sspai",
-   "appcast": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/app.here.sspai/appcast.xml",
+   "appcast": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/src/appcast.xml",
    "script": "index.js",
    "defaultCategory": "News",
    "displayOn": [
