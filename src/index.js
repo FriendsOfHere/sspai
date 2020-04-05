@@ -14,7 +14,7 @@ function updateData() {
     debug(`[Read PREF] 更新文章数:${LIMIT}`)
 
     here.setMiniWindow({ title: "Fetching…" })
-    here.parseRSSFeed('https://rsshub.app/sspai/matrix')
+    here.parseRSSFeed('https://apispeedy.com/rsshub/sspai/matrix')
     .then((feed) => {
         //basic check
         if (feed.items.length <= 0) {
