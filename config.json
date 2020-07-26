@@ -1,7 +1,7 @@
 {
-   "name": "SSPai",
+   "name": "少数派",
    "version": "1.3.0",
-   "description": "Show latest articles from sspai.com",
+   "description": "展示少数派最新文章",
    "identifier": "foh.sspai",
    "createdBy": "Lifesign",
    "icon": "icon.png",
