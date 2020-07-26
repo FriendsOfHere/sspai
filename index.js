@@ -103,7 +103,7 @@ function updateData() {
         renderComponent()
 
         //rerender component display, partial render is not supported for now
-        here.onPopOverDisappear(() => {
+        here.popover.on('close', () => {
             debug("onPopOverDisappear")
             debug("____Rerender component start")
             renderComponent()
