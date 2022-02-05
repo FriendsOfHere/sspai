@@ -9,6 +9,7 @@
    "appcast": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/appcast.xml",
    "script": "index.js",
    "defaultCategory": "News",
+   "queryKeywords": ["sspai", "s", "pai"],
    "displayOn": [
       "mini",
       "menuBar",
