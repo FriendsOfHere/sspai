@@ -14,7 +14,7 @@ function updateData() {
     debug(`[Read PREF] 更新文章数:${LIMIT}`)
 
     here.miniWindow.set({ title: "Fetching…" })
-    here.parseRSSFeed('https://apispeedy.com/rsshub/sspai/matrix')
+    here.parseRSSFeed('https://rsshub.app/sspai/matrix')
     .then((feed) => {
         //basic check
         if (feed.items.length <= 0) {
@@ -61,31 +61,36 @@ function updateData() {
                 detail: "少数派文章更新",
                 accessory: {
                     badge: unreadFeeds.length + ""
-                },
-                popOvers: _.map(unreadFeeds,(item, index) => {
-                    return {
-                        title: isDebugMode() ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}` : `${index + 1}. ${item.title}`,
-                        onClick: () => {
-                            if (item.link != undefined) {
-                                let postId = getPostId(item.link)
-                                //filter cached postId
-                                if (_.indexOf(readIds, postId) == -1) {
-                                    debug(`cache postId:${postId}`)
-                                    readIds.push(postId)
-                                    debug(JSON.stringify(readIds))
-                                    cache.set('readIds', readIds);
-                                } else {
-                                    debug(`cacheExists:${postId} skip`)
-                                }
-
-                                if (!isDebugMode()) {
-                                    here.openURL(item.link)
-                                }
-                            }
-                        },
-                    }
-                })
+                }
             })
+
+            here.popover = new here.ListPopover();
+            here.popover.data = _.map(unreadFeeds, (item, index) => {
+                return {
+                    title: isDebugMode()
+                        ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}`
+                        : `${index + 1}. ${item.title}`,
+                    onClick: () => {
+                        if (item.link != undefined) {
+                            let postId = getPostId(item.link);
+                            //filter cached postId
+                            if (_.indexOf(readIds, postId) == -1) {
+                                debug(`cache postId:${postId}`);
+                                readIds.push(postId);
+                                debug(JSON.stringify(readIds));
+                                cache.set("readIds", readIds);
+                            } else {
+                                debug(`cacheExists:${postId} skip`);
+                            }
+
+                            if (!isDebugMode()) {
+                                here.openURL(item.link);
+                            }
+                        }
+                    },
+                };
+            })
+            here.popover.reload()
 
             // menu bar component display
             here.menuBar.set({
@@ -108,6 +113,10 @@ function updateData() {
             debug("____Rerender component start")
             renderComponent()
         })
+
+        // here.popover.on('show', () => {
+        //     console.log("on show")
+        // })
     })
     .catch((error) => {
         console.error(`Error: ${JSON.stringify(error)}`)
