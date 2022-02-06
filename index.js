@@ -3,25 +3,27 @@ const cache = require('cache')
 const hotkey = require('hotkey')
 const net = require("net")
 const pref = require("pref")
+const i18n = require("i18n")
 
 const {getPostId, getUnreadFeeds} = require('./sspai.js')
 const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
 
 function updateData() {
-    debug("开始更新数据", true)
+    //"开始更新数据"
+    debug(__("update data starting"), true)
 
     const LIMIT = getFetchArticleNum()
     const IS_UNREAD_NOTIFY_OPEN = isUnreadNotifyOpen()
     debug(`[Read PREF] 更新文章数:${LIMIT}`)
     debug(`[Read PREF] 未读消息提醒:${IS_UNREAD_NOTIFY_OPEN}`)
 
-    here.miniWindow.set({ title: "Fetching…" })
+    here.miniWindow.set({ title: __("Fetching…")})
     //TODO replace with pref
     here.parseRSSFeed('https://rsshub.app/sspai/matrix')
     .then((feed) => {
         //basic check
         if (feed.items.length <= 0) {
-            return here.miniWindow.set({ title: "No item found." })
+            return here.miniWindow.set({ title: __("No item found.") })
         }
         if (feed.items.length > LIMIT) {
             feed.items = feed.items.slice(0, LIMIT)
@@ -205,10 +207,10 @@ here.onLoad(() => {
 
 let type = net.effectiveType;
 net.onChange((currentType) => {
-    console.log("Connection type changed from " + type + " to " + currentType);
+    debug("Connection type changed from " + type + " to " + currentType, true);
     type = currentType;
     if (net.isReachable()) {
-        console.log("网络恢复了，重新执行获取数据")
+        console.log(__("net work recovered. execute updating"))
         updateData()
     }
 })
