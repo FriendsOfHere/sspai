@@ -11,7 +11,9 @@ function updateData() {
     debug("开始更新数据", true)
 
     const LIMIT = getFetchArticleNum()
+    const IS_UNREAD_NOTIFY_OPEN = isUnreadNotifyOpen()
     debug(`[Read PREF] 更新文章数:${LIMIT}`)
+    debug(`[Read PREF] 未读消息提醒:${IS_UNREAD_NOTIFY_OPEN}`)
 
     here.miniWindow.set({ title: "Fetching…" })
     //TODO replace with pref
@@ -35,7 +37,7 @@ function updateData() {
             const checkUnreadFeedsNum = getUnreadFeeds(feed.items, cachedPostIds).length
 
             //unread notify
-            if (checkUnreadFeedsNum > 0 && isUnreadNotifyOpen()) {
+            if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
                 //when in debug mode, system notifications will be conflicted
                 //delay the unread notification for seconds later
                 _.delay((unreadNum) => {

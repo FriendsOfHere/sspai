@@ -14,21 +14,30 @@ module.exports = {
     },
     getFetchArticleNum: () => {
         const PAGE_MAP = [10, 15, 20]
-        return PAGE_MAP[_.toSafeInteger(pref.get("article-num"))]
+        const articleNumConf = pref.get("article-num")
+        //default num
+        if (articleNumConf == undefined) {
+            return 10
+        }
+        return PAGE_MAP[_.toSafeInteger(articleNumConf["index"])]
     },
     getMenuBarStyleName: () => {
         const menuStyleConf = pref.get("menuBar-icon-style")
         //default style
         if (menuStyleConf == undefined) {
-            return "menuBarIcon1.png";
+            return "menuBarIcon1.png"
         }
-        return "menuBarIcon" + (_.toSafeInteger(menuStyleConf['index']) + 1) + ".png";
+        return "menuBarIcon" + (_.toSafeInteger(menuStyleConf["index"]) + 1) + ".png"
     },
     isDebugMode: () => {
         return _.toSafeInteger(cache.get("debug-hotkey-switch")) == 1
     },
     isUnreadNotifyOpen: () => {
-        return _.toSafeInteger(pref.get("unread-notify")) == 1
+        const unreadConf = pref.get("unread-notify")
+        if (unreadConf == undefined) {
+            return false
+        }
+        return _.toSafeInteger(unreadConf["index"]) == 1
     },
     getDebugHotkey: () => {
         return pref.get("debug-hotkey")
