@@ -34,16 +34,6 @@
           ]
       },
       {
-          "title": "更新频道",
-          "type": "popup",
-          "key": "update-channel",
-          "default": 0,
-          "options": [
-              "Matrix",
-              "首页推荐(暂未支持)",
-          ]
-      },
-      {
           "title": "未读消息提醒",
           "type": "popup",
           "key": "unread-notify",
