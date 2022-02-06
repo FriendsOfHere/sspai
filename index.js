@@ -88,22 +88,19 @@ function updateData() {
                 here.miniWindow.reload()
 
                 //support multi tab for different channels
-                // let matrixKey = __("Matrix")
-                // let homepageKey = __("Homepage")
-                // const tabRawData = {matrixKey: matrixFeed.items, homepageKey: apiResult.items}
-                // // console.log(tabRawData)
-                // const tabData = _.map(tabRawData, (val, key) => {
-                //     console.log("val: " + val + "key:" + key)
-                //     return {
-                //         "title": key,
-                //         "data": formatTabData(val, readIds)
-                //     }
-                // })
+                let matrixKey = __("Matrix")
+                let homepageKey = __("Homepage")
+                const tabRawData = {[matrixKey]: matrixFeed.items, [homepageKey]: apiResult.items}
+                // console.log(tabRawData)
+                const tabData = _.map(tabRawData, (val, key) => {
+                    // console.log("val: " + val + "key:" + key)
+                    return {
+                        "title": key,
+                        "data": formatTabData(val, readIds)
+                    }
+                })
                 // console.log("tabData:" + JSON.stringify(tabData))
-                here.popover = new here.TabPopover([
-                    {"title": __("Matrix"), "data": formatTabData(matrixFeed.items, readIds)},
-                    {"title": __("Homepage"), "data": formatTabData(apiResult.items, readIds)},
-                ]);
+                here.popover = new here.TabPopover(tabData);
                 here.popover.reload()
 
                 // menu bar component display
