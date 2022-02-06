@@ -5,7 +5,7 @@ const net = require("net")
 const pref = require("pref")
 
 const {getPostId, getUnreadFeeds} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
+const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
 
 function updateData() {
     debug("开始更新数据", true)
@@ -14,6 +14,7 @@ function updateData() {
     debug(`[Read PREF] 更新文章数:${LIMIT}`)
 
     here.miniWindow.set({ title: "Fetching…" })
+    //TODO replace with pref
     here.parseRSSFeed('https://rsshub.app/sspai/matrix')
     .then((feed) => {
         //basic check
@@ -64,38 +65,52 @@ function updateData() {
                 }
             })
 
-            here.popover = new here.ListPopover();
-            here.popover.data = _.map(unreadFeeds, (item, index) => {
-                return {
-                    title: isDebugMode()
-                        ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}`
-                        : `${index + 1}. ${item.title}`,
-                    onClick: () => {
-                        if (item.link != undefined) {
-                            let postId = getPostId(item.link);
-                            //filter cached postId
-                            if (_.indexOf(readIds, postId) == -1) {
-                                debug(`cache postId:${postId}`);
-                                readIds.push(postId);
-                                debug(JSON.stringify(readIds));
-                                cache.set("readIds", readIds);
-                            } else {
-                                debug(`cacheExists:${postId} skip`);
-                            }
+            //support multi tab for different channels
+            here.popover = new here.TabPopover([
+                {
+                    "title": "Matrix",
+                    "data": _.map(unreadFeeds, (item, index) => {
+                        return {
+                            title: isDebugMode()
+                                ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}`
+                                : `${index + 1}. ${item.title}`,
+                            onClick: () => {
+                                if (item.link != undefined) {
+                                    let postId = getPostId(item.link);
+                                    //filter cached postId
+                                    if (_.indexOf(readIds, postId) == -1) {
+                                        debug(`cache postId:${postId}`);
+                                        readIds.push(postId);
+                                        debug(JSON.stringify(readIds));
+                                        cache.set("readIds", readIds);
+                                    } else {
+                                        debug(`cacheExists:${postId} skip`);
+                                    }
 
-                            if (!isDebugMode()) {
-                                here.openURL(item.link);
-                            }
-                        }
-                    },
-                };
-            })
+                                    if (!isDebugMode()) {
+                                        here.openURL(item.link);
+                                    }
+                                }
+                            },
+                        };
+                    })
+                },
+                {
+                    "title": "首页",
+                    "data": []
+                }
+            ]);
             here.popover.reload()
 
             // menu bar component display
+            const stylePath = "./menubar/" + getMenuBarStyleName();
+            debug("menubar style path: " + stylePath);
             here.menuBar.set({
-              title: `SSPAI 未读数(${unreadFeeds.length})`
+              title: `(${unreadFeeds.length})`,
+              icon: stylePath,
             })
+            // here.menuBar.setIcon(stylePath);
+            here.menuBar.reload()
 
             //dock component display
             here.dock.set({

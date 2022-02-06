@@ -14,8 +14,15 @@ module.exports = {
     },
     getFetchArticleNum: () => {
         const PAGE_MAP = [10, 15, 20]
-
         return PAGE_MAP[_.toSafeInteger(pref.get("article-num"))]
+    },
+    getMenuBarStyleName: () => {
+        const menuStyleConf = pref.get("menuBar-icon-style")
+        //default style
+        if (menuStyleConf == undefined) {
+            return "menuBarIcon1.png";
+        }
+        return "menuBarIcon" + (_.toSafeInteger(menuStyleConf['index']) + 1) + ".png";
     },
     isDebugMode: () => {
         return _.toSafeInteger(cache.get("debug-hotkey-switch")) == 1

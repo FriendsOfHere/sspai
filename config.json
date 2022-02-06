@@ -1,6 +1,6 @@
 {
    "name": "少数派",
-   "version": "1.3.0",
+   "version": "1.4.0",
    "description": "展示少数派最新文章",
    "identifier": "foh.sspai",
    "createdBy": "Lifesign",
@@ -51,6 +51,18 @@
           "options": [
               "关闭",
               "开启",
+          ]
+      },
+      {
+          "title": "菜单栏图标样式",
+          "type": "popup",
+          "key": "menuBar-icon-style",
+          "default": 0,
+          "options": [
+              "默认样式",
+              "样式二",
+              "样式三",
+              "样式四",
           ]
       },
       {
