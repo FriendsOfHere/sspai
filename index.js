@@ -54,7 +54,7 @@ function updateData() {
             homepageData.items = _.differenceWith(homepageData.items, matrixData.items, (s, t) => {
                 return s.link == t.link
             })
-            debug(`remainhomepageSize:${homepageData.items.length}`)
+            debug(`remainedHomepageSizeAfterFilter:${homepageData.items.length}`)
             if (matrixData.items.length > LIMIT) {
                 matrixData.items = matrixData.items.slice(0, LIMIT)
             }
