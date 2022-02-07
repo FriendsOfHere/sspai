@@ -22,6 +22,14 @@ function updateData() {
     here.miniWindow.set({ title: __("Fetching…")})
     here.miniWindow.reload()
 
+    // menu bar component display
+    const stylePath = "./menubar/" + getMenuBarStyleName();
+    debug("menubar style path: " + stylePath);
+    here.menuBar.set({
+      icon: stylePath,
+    })
+    here.menuBar.reload()
+
     //use Promise.all to get all the tab data
     Promise.all([getFromFeeds(), getFromApi()])
         .then( (results) => {
@@ -29,6 +37,7 @@ function updateData() {
             let matrixFeed = results[0]
             // console.log(matrixFeed.items)
             let apiResult = results[1]
+
             if (matrixFeed == null && apiResult == null) {
                 console.log("all tabs data get null");
                 here.miniWindow.set({ title: "Fetching Failed..." })
@@ -54,7 +63,7 @@ function updateData() {
                 cache.set('readIds', []);
             } else {
                 cachedPostIds = JSON.parse(cachedPostIds);
-                const checkUnreadFeedsNum = getUnreadFeeds(matrixFeed.items, cachedPostIds).length
+                const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixFeed.items, apiResult.items), cachedPostIds).length
 
                 //unread notify
                 if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
@@ -72,7 +81,7 @@ function updateData() {
                 debug("cachedIDs:" + JSON.stringify(readIds))
 
                 //TOP Feed set......
-                let unreadFeeds = getUnreadFeeds(_.merge({}, matrixFeed.items, apiResult.items), readIds)
+                let unreadFeeds = getUnreadFeeds(_.concat(matrixFeed.items, apiResult.items), readIds)
                 let topFeed = _.head(unreadFeeds)
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
@@ -104,8 +113,8 @@ function updateData() {
                 here.popover.reload()
 
                 // menu bar component display
-                const stylePath = "./menubar/" + getMenuBarStyleName();
-                debug("menubar style path: " + stylePath);
+                // const stylePath = "./menubar/" + getMenuBarStyleName();
+                // debug("menubar style path: " + stylePath);
                 here.menuBar.set({
                   title: `(${unreadFeeds.length})`,
                   icon: stylePath,
