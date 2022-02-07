@@ -6,7 +6,7 @@ const pref = require("pref")
 const i18n = require("i18n")
 const http = require('http')
 
-const {getPostId, getUnreadFeeds, getFromFeeds, getFromApi} = require('./sspai.js')
+const {getPostId, getUnreadFeeds, getMatrixData, getHomepageData} = require('./sspai.js')
 const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
 
 function updateData() {
@@ -31,7 +31,7 @@ function updateData() {
     here.menuBar.reload()
 
     //use Promise.all to get all the tab data
-    Promise.all([getFromFeeds(), getFromApi()])
+    Promise.all([getMatrixData(), getHomepageData()])
         .then( (results) => {
             //console.log(results)
             let matrixFeed = results[0]
@@ -43,11 +43,14 @@ function updateData() {
                 here.miniWindow.set({ title: "Fetching Failed..." })
                 return
             }
+            debug(`matrixSize:${matrixFeed.items.length} apiSize:${apiResult.items.length}`)
             //basic check
             if ((matrixFeed.items.length + apiResult.items.length) <= 0) {
                 here.miniWindow.set({ title: __("No item found.") })
                 return
             }
+
+            //filter apiResult
 
             if (matrixFeed.items.length > LIMIT) {
                 matrixFeed.items = matrixFeed.items.slice(0, LIMIT)
@@ -64,7 +67,7 @@ function updateData() {
             } else {
                 cachedPostIds = JSON.parse(cachedPostIds);
                 const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixFeed.items, apiResult.items), cachedPostIds).length
-
+                console.log("unread total: " + checkUnreadFeedsNum)
                 //unread notify
                 if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
                     //when in debug mode, system notifications will be conflicted
