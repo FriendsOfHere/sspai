@@ -1,4 +1,4 @@
-module.exports = {
+const sspai = {
     // format: https://sspai.com/post/58856
     getPostId: (postLink) => {
         return postLink == undefined ? '' : _.last(_.split(postLink, '/'))
@@ -10,7 +10,7 @@ module.exports = {
         return _.filter(feeds, (item, index) => !_.includes(readIds, getPostId(item.link)))
     },
     getFromFeeds: () => {
-        return here.parseRSSFeed('https://rsshub.app/sspai/matrix')
+        return here.parseRSSFeed('https://rsshub.app/sspai/matrix?limit=30')
             .then( (feed) => {
                 return feed
             })
@@ -31,7 +31,7 @@ module.exports = {
                         // console.log(item["id"])
                         // console.log(sspai.formatLinkByPostId(item["id"]))
                         return {
-                            link: "https://sspai.com/post/" + item["id"],
+                            link: sspai.formatLinkByPostId(item["id"]),
                             title: item["title"]
                         }
                     })
@@ -41,6 +41,8 @@ module.exports = {
     }
 
 }
+
+module.exports = sspai
 
 
 
