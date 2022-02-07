@@ -1,3 +1,5 @@
+//should gte pref
+const DEFAULT_API_FETCH_SIZE = 30
 const sspai = {
     // format: https://sspai.com/post/58856
     getPostId: (postLink) => {
@@ -16,7 +18,7 @@ const sspai = {
         //         return feed
         //     })
         //     // .catch( (err) => { console.error("error from feeds" + err) })
-        return http.get("https://sspai.com/api/v1/articles?offset=0&limit=30&is_matrix=1&sort=matrix_at&include_total=false")
+        return http.get(`https://sspai.com/api/v1/articles?offset=0&limit=${DEFAULT_API_FETCH_SIZE}&is_matrix=1&sort=matrix_at&include_total=false`)
             .then( (body) => {
                 const json = body.data
                 // console.log(json)
@@ -39,7 +41,7 @@ const sspai = {
             // .catch( (err) => { console.error("error from api: " + err) })
     },
     getHomepageData: () => {
-        return http.get("https://sspai.com/api/v1/article/index/page/get?limit=30&offset=1&created_at=0")
+        return http.get(`https://sspai.com/api/v1/article/index/page/get?limit=${DEFAULT_API_FETCH_SIZE}&offset=1&created_at=0`)
             .then( (body) => {
                 const json = body.data
                 // console.log(json)

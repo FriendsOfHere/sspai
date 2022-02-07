@@ -33,7 +33,7 @@ function updateData() {
     //use Promise.all to get all the tab data
     Promise.all([getMatrixData(), getHomepageData()])
         .then( (results) => {
-            //console.log(results)
+            // console.log(results)
             let matrixData = results[0]
             // console.log(matrixData.items)
             let homepageData = results[1]
@@ -50,8 +50,11 @@ function updateData() {
                 return
             }
 
-            //filter homepageData
-
+            //filter homepageData in matrixData
+            homepageData.items = _.differenceWith(homepageData.items, matrixData.items, (s, t) => {
+                return s.link == t.link
+            })
+            debug(`remainhomepageSize:${homepageData.items.length}`)
             if (matrixData.items.length > LIMIT) {
                 matrixData.items = matrixData.items.slice(0, LIMIT)
             }
