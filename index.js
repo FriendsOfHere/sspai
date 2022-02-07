@@ -34,29 +34,29 @@ function updateData() {
     Promise.all([getMatrixData(), getHomepageData()])
         .then( (results) => {
             //console.log(results)
-            let matrixFeed = results[0]
-            // console.log(matrixFeed.items)
-            let apiResult = results[1]
+            let matrixData = results[0]
+            // console.log(matrixData.items)
+            let homepageData = results[1]
 
-            if (matrixFeed == null && apiResult == null) {
+            if (matrixData == null && homepageData == null) {
                 console.log("all tabs data get null");
                 here.miniWindow.set({ title: "Fetching Failed..." })
                 return
             }
-            debug(`matrixSize:${matrixFeed.items.length} apiSize:${apiResult.items.length}`)
+            debug(`matrixSize:${matrixData.items.length} homepageSize:${homepageData.items.length}`)
             //basic check
-            if ((matrixFeed.items.length + apiResult.items.length) <= 0) {
+            if ((matrixData.items.length + homepageData.items.length) <= 0) {
                 here.miniWindow.set({ title: __("No item found.") })
                 return
             }
 
-            //filter apiResult
+            //filter homepageData
 
-            if (matrixFeed.items.length > LIMIT) {
-                matrixFeed.items = matrixFeed.items.slice(0, LIMIT)
+            if (matrixData.items.length > LIMIT) {
+                matrixData.items = matrixData.items.slice(0, LIMIT)
             }
-            if (apiResult.items.length > LIMIT) {
-                apiResult.items = apiResult.items.slice(0, LIMIT)
+            if (homepageData.items.length > LIMIT) {
+                homepageData.items = homepageData.items.slice(0, LIMIT)
             }
 
             //init read list cache
@@ -66,7 +66,7 @@ function updateData() {
                 cache.set('readIds', []);
             } else {
                 cachedPostIds = JSON.parse(cachedPostIds);
-                const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixFeed.items, apiResult.items), cachedPostIds).length
+                const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
                 console.log("unread total: " + checkUnreadFeedsNum)
                 //unread notify
                 if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
@@ -84,7 +84,7 @@ function updateData() {
                 debug("cachedIDs:" + JSON.stringify(readIds))
 
                 //TOP Feed set......
-                let unreadFeeds = getUnreadFeeds(_.concat(matrixFeed.items, apiResult.items), readIds)
+                let unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
                 let topFeed = _.head(unreadFeeds)
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
@@ -102,7 +102,7 @@ function updateData() {
                 //support multi tab for different channels
                 let matrixKey = __("Matrix")
                 let homepageKey = __("Homepage")
-                const tabRawData = {[matrixKey]: matrixFeed.items, [homepageKey]: apiResult.items}
+                const tabRawData = {[matrixKey]: matrixData.items, [homepageKey]: homepageData.items}
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
                     // console.log("val: " + val + "key:" + key)
