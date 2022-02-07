@@ -1,6 +1,6 @@
 {
    "name": "少数派",
-   "version": "1.3.0",
+   "version": "1.4.0",
    "description": "展示少数派最新文章",
    "identifier": "foh.sspai",
    "createdBy": "Lifesign",
@@ -9,6 +9,7 @@
    "appcast": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/appcast.xml",
    "script": "index.js",
    "defaultCategory": "News",
+   "queryKeywords": ["sspai", "pai"],
    "displayOn": [
       "mini",
       "menuBar",
@@ -33,16 +34,6 @@
           ]
       },
       {
-          "title": "更新频道",
-          "type": "popup",
-          "key": "update-channel",
-          "default": 0,
-          "options": [
-              "Matrix",
-              "首页推荐(暂未支持)",
-          ]
-      },
-      {
           "title": "未读消息提醒",
           "type": "popup",
           "key": "unread-notify",
@@ -50,6 +41,18 @@
           "options": [
               "关闭",
               "开启",
+          ]
+      },
+      {
+          "title": "菜单栏图标样式",
+          "type": "popup",
+          "key": "menuBar-icon-style",
+          "default": 0,
+          "options": [
+              "默认样式",
+              "样式二",
+              "样式三",
+              "样式四",
           ]
       },
       {
