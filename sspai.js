@@ -17,7 +17,7 @@ module.exports = {
             // .catch( (err) => { console.error("error from feeds" + err) })
     },
      getFromApi: () => {
-        return http.get("https://sspai.com/api/v1/article/index/page/get?limit=10&offset=0&created_at=0")
+        return http.get("https://sspai.com/api/v1/article/index/page/get?limit=30&offset=1&created_at=0")
             .then( (body) => {
                 const json = body.data
                 // console.log(json)
