@@ -109,7 +109,10 @@ function updateData() {
                 //support multi tab for different channels
                 let matrixKey = __("Matrix")
                 let homepageKey = __("Homepage")
-                const tabRawData = {[matrixKey]: matrixData.items, [homepageKey]: homepageData.items}
+                const tabRawData = {
+                    [matrixKey]: getUnreadFeeds(matrixData.items, readIds),
+                    [homepageKey]: getUnreadFeeds(homepageData.items, readIds),
+                }
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
                     // console.log("val: " + val + "key:" + key)
@@ -148,8 +151,8 @@ function updateData() {
 
             //rerender component display, partial render is not supported for now
             here.popover.on('close', () => {
-                debug("onPopOverDisappear")
-                debug("Rerender component start", true)
+                debug("onPopOverDisappear", true)
+                debug("Rerender component start")
                 // here.popover.reload()
                 renderComponent()
             })
@@ -164,7 +167,9 @@ function updateData() {
 
 function formatTabData(rawUnreadFeeds, readIds) {
     // console.log(rawUnreadFeeds)
-    // return []
+    if (_.isEmpty(rawUnreadFeeds)) {
+        return [{title: "Nothing New here."}]
+    }
     return _.map(rawUnreadFeeds, (item, index) => {
         // console.log("item detail" + JSON.stringify(item))
         return {
@@ -176,9 +181,9 @@ function formatTabData(rawUnreadFeeds, readIds) {
                     let postId = getPostId(item.link);
                     //filter cached postId
                     if (_.indexOf(readIds, postId) == -1) {
-                        debug(`cache postId:${postId}`);
+                        debug(`[click] push postId:${postId} to cache`, false, true);
                         readIds.push(postId);
-                        debug(JSON.stringify(readIds));
+                        // debug(JSON.stringify(readIds));
                         cache.set("readIds", readIds);
                     } else {
                         debug(`cacheExists:${postId} skip`);
