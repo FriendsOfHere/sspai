@@ -95,7 +95,24 @@ function updateData() {
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
                     onClick: () => {
-                        if (topFeed != undefined && topFeed.link != undefined)  { here.openURL(topFeed.link) }
+                        //console.log("topfeed is" + JSON.stringify(topFeed))
+                        if (topFeed != undefined && topFeed.link != undefined)  {
+                            let postId = getPostId(topFeed.link);
+                            console.log("get post id:" + postId)
+                            //filter cached postId
+                            if (_.indexOf(readIds, postId) == -1) {
+                                debug(`[click] push postId:${postId} to cache`, false, true);
+                                readIds.push(postId);
+                                cache.set("readIds", readIds);
+                            } else {
+                                debug(`cacheExists:${postId} skip`);
+                            }
+
+                            if (!isDebugMode()) {
+                                here.openURL(topFeed.link);
+                                here.miniWindow.hide()
+                            }
+                        }
                     },
                     title: topFeed == undefined ? '暂无最新文章' : `${isDebugMode() ? "🐞" : ""}${topFeed.title}`,
                     detail: "少数派文章更新",
