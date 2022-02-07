@@ -23,13 +23,14 @@
 - Readable debug console log
 - Unread notification
 - Dynamic unread num (mini window、menu bar、dock)
+- Runtime menuBar icon style change
 
 ## Configurations
 1. Update frequency (time unit: **h**)
 2. Article fetch num (default: **10**)
 3. Debug hotkey binding (default: `cmd+F1`)
 4. Unread notification (default: **close**)
-5. Article channels (**Matrix**)
+5. MenuBar icon style (**4 included**)
 
 ## Development
 
@@ -41,7 +42,8 @@
 
 ## Roadmap
 - [ ] add setting for show/hide read articles
-- [ ] more channel support
+- [x] menuBar icon style
+- [x] more channel support
 - [ ] read statistics
 - [ ] channel filter
 
