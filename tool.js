@@ -23,6 +23,7 @@ module.exports = {
     },
     getMenuBarStyleName: () => {
         const menuStyleConf = pref.get("menuBar-icon-style")
+        debug("[Read PREF] menuBarIconIndex:" + _.toSafeInteger(menuStyleConf["index"]))
         //default style
         if (menuStyleConf == undefined) {
             return "menuBarIcon1.png"
@@ -57,7 +58,7 @@ module.exports = {
         } else {
             console.log(`${span}${log}`)
         }
-    }
+    },
 }
 
 

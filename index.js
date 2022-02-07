@@ -21,6 +21,7 @@ function updateData() {
     //component init render
     here.miniWindow.set({ title: __("Fetching…")})
     here.miniWindow.reload()
+    debug("[COMPONENT] miniWindow reloaded. finish title setting")
 
     // menu bar component display
     const stylePath = "./menubar/" + getMenuBarStyleName();
@@ -29,6 +30,7 @@ function updateData() {
       icon: stylePath,
     })
     here.menuBar.reload()
+    debug("[COMPONENT] miniWindow reloaded. finish menubar icon setting")
 
     //use Promise.all to get all the tab data
     Promise.all([getMatrixData(), getHomepageData()])
@@ -43,7 +45,7 @@ function updateData() {
                 here.miniWindow.set({ title: "Fetching Failed..." })
                 return
             }
-            debug(`matrixSize:${matrixData.items.length} homepageSize:${homepageData.items.length}`)
+            debug(`fetchedAPIDataRawSize: matrix-${matrixData.items.length} homepage-${homepageData.items.length}`)
             //basic check
             if ((matrixData.items.length + homepageData.items.length) <= 0) {
                 here.miniWindow.set({ title: __("No item found.") })
@@ -54,13 +56,14 @@ function updateData() {
             homepageData.items = _.differenceWith(homepageData.items, matrixData.items, (s, t) => {
                 return s.link == t.link
             })
-            debug(`remainedHomepageSizeAfterFilter:${homepageData.items.length}`)
+            debug(`filter Homepage duplicate data. remain:${homepageData.items.length}`)
             if (matrixData.items.length > LIMIT) {
                 matrixData.items = matrixData.items.slice(0, LIMIT)
             }
             if (homepageData.items.length > LIMIT) {
                 homepageData.items = homepageData.items.slice(0, LIMIT)
             }
+            debug(`toRenderSize. matrix:${matrixData.items.length} homepage:${homepageData.items.length}`)
 
             //init read list cache
             let cachedPostIds = cache.get('readIds');
@@ -70,7 +73,7 @@ function updateData() {
             } else {
                 cachedPostIds = JSON.parse(cachedPostIds);
                 const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
-                console.log("unread total: " + checkUnreadFeedsNum)
+                debug("unread total: " + checkUnreadFeedsNum)
                 //unread notify
                 if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
                     //when in debug mode, system notifications will be conflicted
@@ -81,10 +84,10 @@ function updateData() {
                 }
             }
 
-    //         // render component
+            // render component
             let renderComponent = () => {
                 let readIds = JSON.parse(cache.get('readIds'));
-                debug("cachedIDs:" + JSON.stringify(readIds))
+                debug(`cachedIDs:${JSON.stringify(readIds)}`)
 
                 //TOP Feed set......
                 let unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
@@ -101,6 +104,7 @@ function updateData() {
                     }
                 })
                 here.miniWindow.reload()
+                debug("[COMPONENT] miniWindow reloaded.")
 
                 //support multi tab for different channels
                 let matrixKey = __("Matrix")
@@ -117,6 +121,7 @@ function updateData() {
                 // console.log("tabData:" + JSON.stringify(tabData))
                 here.popover = new here.TabPopover(tabData);
                 here.popover.reload()
+                debug("[COMPONENT] popover reloaded.")
 
                 // menu bar component display
                 // const stylePath = "./menubar/" + getMenuBarStyleName();
@@ -127,6 +132,7 @@ function updateData() {
                 })
                 // here.menuBar.setIcon(stylePath);
                 here.menuBar.reload()
+                debug("[COMPONENT] menuBar reloaded.")
 
                 //dock component display
                 here.dock.set({
@@ -134,15 +140,16 @@ function updateData() {
                     detail: "少数派更新"
                 })
                 here.dock.reload()
+                debug("[COMPONENT] dock reloaded.")
             }
 
-            debug("Render component start...")
+            debug("Render component start...", true)
             renderComponent()
 
             //rerender component display, partial render is not supported for now
             here.popover.on('close', () => {
                 debug("onPopOverDisappear")
-                debug("____Rerender component start")
+                debug("Rerender component start", true)
                 // here.popover.reload()
                 renderComponent()
             })
@@ -235,13 +242,13 @@ function initDebugHotKey() {
  * - save plugin pref
  * - reload plugin in Debug Console
  */
-here.onLoad(() => {
+here.on("load", () => {
     debug("========== Plugin Debug Info Start ==========", false, true)
     debug("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓", false, true)
     //main flow
     debug(`init debug feature`, true)
     initDebugHotKey();
-    debug(`[DEBUG_MODE] ${isDebugMode()}`)
+    debug(`[CURRENT_DEBUG_MODE] ${isDebugMode()}`)
     updateData()
     setInterval(updateData, getUpdateFrequency() * 3600 * 1000);
 })
