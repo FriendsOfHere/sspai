@@ -8,6 +8,13 @@ const sspai = {
     formatLinkByPostId: (postId) => {
         return "https://sspai.com/post/" + postId
     },
+    formatLinkByAvatar: (url) => {
+        if (_.isBlank(url) || _.includes(url, "gif")) {
+          debug(`invalid avatar url: ${url}. fallback to placeholder.`)
+          url = "ui/avatar-placeholder.png"
+        }
+        return "https://cdn.sspai.com/" + url
+    },
     getUnreadFeeds: (feeds, readIds) => {
         return _.filter(feeds, (item, index) => !_.includes(readIds, getPostId(item.link)))
     },
@@ -33,7 +40,8 @@ const sspai = {
                         // console.log(sspai.formatLinkByPostId(item["id"]))
                         return {
                             link: sspai.formatLinkByPostId(item["id"]),
-                            title: item["title"]
+                            title: item["title"],
+                            avatar: sspai.formatLinkByAvatar(item["author"]["avatar"])
                         }
                     })
                 }
@@ -56,7 +64,8 @@ const sspai = {
                         // console.log(sspai.formatLinkByPostId(item["id"]))
                         return {
                             link: sspai.formatLinkByPostId(item["id"]),
-                            title: item["title"]
+                            title: item["title"],
+                            avatar: sspai.formatLinkByAvatar(item["author"]["avatar"])
                         }
                     })
                 }
