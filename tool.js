@@ -1,3 +1,8 @@
+function isBlank(value) {
+    return _.isEmpty(value) && !_.isNumber(value) || _.isNaN(value)
+}
+_.mixin({ isBlank })
+
 module.exports = {
     getUpdateFrequency: () => {
         const DEFAULT_MIN_FREQUENCY = 2
