@@ -147,7 +147,7 @@ function updateData() {
                 // const stylePath = "./menubar/" + getMenuBarStyleName();
                 // debug("menubar style path: " + stylePath);
                 here.menuBar.set({
-                  title: `(${unreadFeeds.length})`,
+                  title: ` ${unreadFeeds.length}`,
                   icon: stylePath,
                 })
                 // here.menuBar.setIcon(stylePath);
@@ -189,10 +189,16 @@ function formatTabData(rawUnreadFeeds, readIds) {
     }
     return _.map(rawUnreadFeeds, (item, index) => {
         // console.log("item detail" + JSON.stringify(item))
+        // console.log("item avatar: " + item.avatar)
         return {
             title: isDebugMode()
                 ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}`
                 : `${index + 1}. ${item.title}`,
+            accessory: {
+                title: "",
+                imageURL: `${item.avatar}`,
+                imageCornerRadius: 4,
+            },
             onClick: () => {
                 if (item.link != undefined) {
                     let postId = getPostId(item.link);
