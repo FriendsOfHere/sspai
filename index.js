@@ -66,32 +66,25 @@ function updateData() {
             }
             debug(`toRenderSize. matrix:${matrixData.items.length} homepage:${homepageData.items.length}`)
 
-            //init read list cache
-            let cachedPostIds = cache.get('readIds');
-            if (cachedPostIds == undefined) {
-                debug("🚀 已读列表初始化缓存")
-                cache.set('readIds', []);
-            } else {
-                cachedPostIds = JSON.parse(cachedPostIds);
-                const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
-                debug("unread total: " + checkUnreadFeedsNum)
-                //unread notify
-                if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
-                    //when in debug mode, system notifications will be conflicted
-                    //delay the unread notification for seconds later
-                    _.delay((unreadNum) => {
-                        here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
-                    }, isDebugMode() ? 5000 : 1000);
-                }
+            const cachedPostIds = JSON.parse(cache.get('readIds') || '[]');
+            const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
+            debug("unread total: " + checkUnreadFeedsNum)
+            //unread notify
+            if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
+                //when in debug mode, system notifications will be conflicted
+                //delay the unread notification for seconds later
+                _.delay((unreadNum) => {
+                    here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
+                }, isDebugMode() ? 5000 : 1000);
             }
 
             // render component
             let renderComponent = () => {
-                let readIds = JSON.parse(cache.get('readIds'));
+                let readIds = JSON.parse(cache.get('readIds') || '[]');
                 debug(`cachedIDs:${JSON.stringify(readIds)}`)
 
                 //TOP Feed set......
-                let unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
+                const unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
                 let topFeed = _.head(unreadFeeds)
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
@@ -183,14 +176,17 @@ function updateData() {
                                 title: "一键清除缓存",
                                 accessory: new here.MainTextAccessory({
                                     title: "谨慎使用",
-                                    // detail: "Some detail"
-                                })
+                                }),
+                                onClick: () => {
+                                    cache.removeAll()
+                                    here.hudNotification("Cache info cleared.");
+                                }
                             },
                             {
                                 title: "一键复制缓存信息",
                                 onClick: () => {
                                     pb.setText(JSON.stringify(cache.all()));
-                                    here.hudNotification("Debug info copied.");
+                                    here.hudNotification("Cache info copied.");
                                 }
                             },
                         ]
