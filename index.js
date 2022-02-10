@@ -5,9 +5,10 @@ const net = require("net")
 const pref = require("pref")
 const i18n = require("i18n")
 const http = require('http')
+const pb = require('pasteboard')
 
 const {getPostId, getUnreadFeeds, getMatrixData, getHomepageData} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
+const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, getExpertMode, debug} = require('./tool.js')
 
 function updateData() {
     debug(__("update data starting"), true)
@@ -138,6 +139,68 @@ function updateData() {
                         "data": formatTabData(val, readIds)
                     }
                 })
+
+                //expert mode tab
+                if (getExpertMode()) {
+                    let expertModeTab = {
+                        "title": "⚙️高级设置🤫",
+                        "data": [
+                            {
+                                title: "=================展示配置================="
+                            },
+                            {
+                                title: "是否展示作者头像",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-avatar",
+                                    isOn: true,
+                                    onValueChange: (isOn) => {
+                                        console.log(`isOn: ${isOn}`);
+                                        here.popover.update(`#accessory-avatar.isOn`, isOn)
+                                        here.hudNotification(`avatar is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                            {
+                                title: "是否展示已读文章",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-read",
+                                    isOn: true,
+                                    onValueChange: (isOn) => {
+                                        console.log(`isOn: ${isOn}`);
+                                        here.popover.update(`#accessory-read.isOn`, isOn)
+                                        here.hudNotification(`read is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                        ]
+                    }
+                    if (isDebugMode()) {
+                        let debugLineData = [
+                            {
+                                title: "=================DEBUG================="
+                            },
+                            {
+                                title: "一键清除缓存",
+                                accessory: new here.MainTextAccessory({
+                                    title: "谨慎使用",
+                                    // detail: "Some detail"
+                                })
+                            },
+                            {
+                                title: "一键复制缓存信息",
+                                onClick: () => {
+                                    pb.setText(JSON.stringify(cache.all()));
+                                    here.hudNotification("Debug info copied.");
+                                }
+                            },
+                        ]
+
+                        let mergeData = expertModeTab.data
+                        mergeData.push(...debugLineData)
+                    }
+                    tabData.push(expertModeTab)
+                }
+
                 // console.log("tabData:" + JSON.stringify(tabData))
                 here.popover = new here.TabPopover(tabData);
                 here.popover.reload()
