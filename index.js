@@ -135,6 +135,9 @@ function updateData() {
 
                 //expert mode tab
                 if (getExpertMode()) {
+                    let expertModeConfig = JSON.parse(cache.get('expert') || '{}')
+                    console.log("avatar switch: " + getShowExpertSpecificSwitch('avatar', true))
+                    console.log("read switch: " + getShowExpertSpecificSwitch('read', false))
                     let expertModeTab = {
                         "title": "⚙️高级设置🤫",
                         "data": [
@@ -145,11 +148,15 @@ function updateData() {
                                 title: "是否展示作者头像",
                                 accessory: new here.SwitchAccessory({
                                     id: "accessory-avatar",
-                                    isOn: true,
+                                    isOn: getShowExpertSpecificSwitch('avatar', true),
                                     onValueChange: (isOn) => {
-                                        console.log(`isOn: ${isOn}`);
+                                        console.log(`accessory-avatar isOn: ${isOn}`);
+                                        expertModeConfig['avatar'] = isOn ? true : false
+                                        // console.log(expertModeConfig)
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
                                         here.popover.update(`#accessory-avatar.isOn`, isOn)
-                                        here.hudNotification(`avatar is ${isOn ? "On" : "Off"}.`);
+                                        here.hudNotification(`avatar switch is ${isOn ? "On" : "Off"}.`);
                                     }
                                 }),
                             },
@@ -157,11 +164,14 @@ function updateData() {
                                 title: "是否展示已读文章",
                                 accessory: new here.SwitchAccessory({
                                     id: "accessory-read",
-                                    isOn: true,
+                                    isOn: getShowExpertSpecificSwitch('read', false),
                                     onValueChange: (isOn) => {
-                                        console.log(`isOn: ${isOn}`);
+                                        console.log(`read isOn: ${isOn}`);
+                                        expertModeConfig['read'] = isOn ? true : false
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
                                         here.popover.update(`#accessory-read.isOn`, isOn)
-                                        here.hudNotification(`read is ${isOn ? "On" : "Off"}.`);
+                                        here.hudNotification(`read post switch is ${isOn ? "On" : "Off"}.`);
                                     }
                                 }),
                             },
@@ -239,6 +249,12 @@ function updateData() {
             //TODO interrupt retry ，api not supported
             here.miniWindow.set({ title: "Fetching Failed..." })
         })
+}
+
+function getShowExpertSpecificSwitch(switchName, notExistsDefaultValue) {
+    const expertModeConfig = JSON.parse(cache.get('expert') || '{}')
+    if (_.isEmpty(expertModeConfig) || expertModeConfig[switchName] == undefined) return notExistsDefaultValue
+    return expertModeConfig[switchName]
 }
 
 function formatTabData(rawUnreadFeeds, readIds) {
