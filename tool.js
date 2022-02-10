@@ -48,6 +48,9 @@ module.exports = {
     getDebugHotkey: () => {
         return pref.get("debug-hotkey")
     },
+    getExpertMode: () => {
+        return pref.get("expert-mode")
+    },
     debug: (log, isMainFlow = false, override = false) => {
         let span = ""
         if (!isMainFlow) {

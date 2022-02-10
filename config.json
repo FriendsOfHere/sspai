@@ -61,6 +61,12 @@
           "type": "text",
           "key": "debug-hotkey",
           "default": "cmd+F1",
+      },
+      {
+          "title": "高级模式",
+          "type": "checkbox",
+          "key": "expert-mode",
+          "default": false,
       }
    ]
 }
