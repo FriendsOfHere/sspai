@@ -18,6 +18,17 @@ const sspai = {
     getUnreadFeeds: (feeds, readIds) => {
         return _.filter(feeds, (item, index) => !_.includes(readIds, getPostId(item.link)))
     },
+    getFeedsWithRead: (feeds, readIds) => {
+        return _.map(feeds, (feed, index) => {
+            if (_.includes(readIds, getPostId(feed.link))) {
+                //need to mark as read post and return
+                if (!feed.title.includes('[√]')) {
+                    feed.title = `[√]${feed.title}`
+                }
+            }
+            return feed
+        })
+    },
     getMatrixData: () => {
         // replace rsshub feeds with directly api call, cause limit size not work in feeds.
         // return here.parseRSSFeed('https://rsshub.app/sspai/matrix?limit=30')

@@ -7,7 +7,7 @@ const i18n = require("i18n")
 const http = require('http')
 const pb = require('pasteboard')
 
-const {getPostId, getUnreadFeeds, getMatrixData, getHomepageData} = require('./sspai.js')
+const {getPostId, getUnreadFeeds, getFeedsWithRead, getMatrixData, getHomepageData} = require('./sspai.js')
 const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, getExpertMode, debug} = require('./tool.js')
 
 function updateData() {
@@ -121,9 +121,9 @@ function updateData() {
                 let matrixKey = __("Matrix")
                 let homepageKey = __("Homepage")
                 const tabRawData = {
-                    [matrixKey]: getUnreadFeeds(matrixData.items, readIds),
+                    [matrixKey]: getFeedsWithRead(matrixData.items, readIds),
                     ...(getShowExpertSpecificSwitch('index-channel', true))
-                        && {[homepageKey]: getUnreadFeeds(homepageData.items, readIds)},
+                        && {[homepageKey]: getFeedsWithRead(homepageData.items, readIds)},
                 }
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
