@@ -271,8 +271,8 @@ function formatTabData(rawUnreadFeeds, readIds) {
                 : `${index + 1}. ${item.title}`,
             accessory: {
                 title: "",
-                imageURL: `${item.avatar}`,
-                imageCornerRadius: 4,
+                ...(getShowExpertSpecificSwitch('avatar', true)) && {imageURL: `${item.avatar}`},
+                ...(getShowExpertSpecificSwitch('avatar', true)) && {imageCornerRadius: 4}
             },
             onClick: () => {
                 if (item.link != undefined) {
