@@ -122,7 +122,8 @@ function updateData() {
                 let homepageKey = __("Homepage")
                 const tabRawData = {
                     [matrixKey]: getUnreadFeeds(matrixData.items, readIds),
-                    [homepageKey]: getUnreadFeeds(homepageData.items, readIds),
+                    ...(getShowExpertSpecificSwitch('index-channel', true))
+                        && {[homepageKey]: getUnreadFeeds(homepageData.items, readIds)},
                 }
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
@@ -138,6 +139,7 @@ function updateData() {
                     let expertModeConfig = JSON.parse(cache.get('expert') || '{}')
                     console.log("avatar switch: " + getShowExpertSpecificSwitch('avatar', true))
                     console.log("read switch: " + getShowExpertSpecificSwitch('read', false))
+                    console.log("index-channel switch: " + getShowExpertSpecificSwitch('index-channel', true))
                     let expertModeTab = {
                         "title": "⚙️高级设置🤫",
                         "data": [
@@ -172,6 +174,21 @@ function updateData() {
                                         console.log(cache.get('expert'))
                                         here.popover.update(`#accessory-read.isOn`, isOn)
                                         here.hudNotification(`read post switch is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                            {
+                                title: "是否展示[首页]频道",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-index-channel",
+                                    isOn: getShowExpertSpecificSwitch('index-channel', false),
+                                    onValueChange: (isOn) => {
+                                        console.log(`index channel isOn: ${isOn}`);
+                                        expertModeConfig['index-channel'] = isOn ? true : false
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
+                                        here.popover.update(`#accessory-index-channel.isOn`, isOn)
+                                        here.hudNotification(`index channel switch is ${isOn ? "On" : "Off"}.`);
                                     }
                                 }),
                             },
