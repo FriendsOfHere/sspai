@@ -22,8 +22,8 @@ const sspai = {
         return _.map(feeds, (feed, index) => {
             if (_.includes(readIds, getPostId(feed.link))) {
                 //need to mark as read post and return
-                if (!feed.title.includes('[√]')) {
-                    feed.title = `[√]${feed.title}`
+                if (!feed.title.includes('[已阅]')) {
+                    feed.title = `[已阅]${feed.title}`
                 }
             }
             return feed

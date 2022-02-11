@@ -121,9 +121,9 @@ function updateData() {
                 let matrixKey = __("Matrix")
                 let homepageKey = __("Homepage")
                 const tabRawData = {
-                    [matrixKey]: getFeedsWithRead(matrixData.items, readIds),
+                    [matrixKey]: getRenderedData(matrixData.items, readIds),
                     ...(getShowExpertSpecificSwitch('index-channel', true))
-                        && {[homepageKey]: getFeedsWithRead(homepageData.items, readIds)},
+                        && {[homepageKey]: getRenderedData(homepageData.items, readIds)},
                 }
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
@@ -272,6 +272,14 @@ function getShowExpertSpecificSwitch(switchName, notExistsDefaultValue) {
     const expertModeConfig = JSON.parse(cache.get('expert') || '{}')
     if (_.isEmpty(expertModeConfig) || expertModeConfig[switchName] == undefined) return notExistsDefaultValue
     return expertModeConfig[switchName]
+}
+
+function getRenderedData(feeds, readIds) {
+    const readSwitch = getShowExpertSpecificSwitch('read', false)
+    if (readSwitch) {
+        return getFeedsWithRead(feeds, readIds)
+    }
+    return getUnreadFeeds(feeds, readIds)
 }
 
 function formatTabData(rawUnreadFeeds, readIds) {
