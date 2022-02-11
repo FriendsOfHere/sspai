@@ -67,7 +67,11 @@ function updateData() {
             debug(`toRenderSize. matrix:${matrixData.items.length} homepage:${homepageData.items.length}`)
 
             const cachedPostIds = JSON.parse(cache.get('readIds') || '[]');
-            const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
+            const checkUnreadFeedsNum = getUnreadFeeds(
+                (getShowExpertSpecificSwitch('index-channel', true)
+                    ? _.concat(matrixData.items, homepageData.items)
+                    : matrixData.items),
+                cachedPostIds).length
             debug("unread total: " + checkUnreadFeedsNum)
             //unread notify
             if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
@@ -84,7 +88,11 @@ function updateData() {
                 debug(`cachedIDs:${JSON.stringify(readIds)}`)
 
                 //TOP Feed set......
-                const unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
+                const unreadFeeds = getUnreadFeeds(
+                    (getShowExpertSpecificSwitch('index-channel', true)
+                    ? _.concat(matrixData.items, homepageData.items)
+                    : matrixData.items),
+                    readIds)
                 let topFeed = _.head(unreadFeeds)
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
@@ -181,7 +189,7 @@ function updateData() {
                                 title: "是否展示[首页]频道",
                                 accessory: new here.SwitchAccessory({
                                     id: "accessory-index-channel",
-                                    isOn: getShowExpertSpecificSwitch('index-channel', false),
+                                    isOn: getShowExpertSpecificSwitch('index-channel', true),
                                     onValueChange: (isOn) => {
                                         console.log(`index channel isOn: ${isOn}`);
                                         expertModeConfig['index-channel'] = isOn ? true : false
@@ -242,7 +250,7 @@ function updateData() {
 
                 //dock component display
                 here.dock.set({
-                    title: unreadFeeds.length.toString(),
+                    title: `${unreadFeeds.length}`,
                     detail: "少数派更新"
                 })
                 here.dock.reload()
