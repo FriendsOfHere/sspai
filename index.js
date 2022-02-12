@@ -226,6 +226,13 @@ function updateData() {
                                     here.hudNotification("Cache info copied.");
                                 }
                             },
+                            {
+                                title: "一键清除已读",
+                                onClick: () => {
+                                    cache.remove("readIds")
+                                    here.hudNotification("Read cache cleared.");
+                                }
+                            },
                         ]
 
                         let mergeData = expertModeTab.data
