@@ -331,7 +331,7 @@ function formatTabData(rawUnreadFeeds, readIds) {
 
 function initDebugHotKey() {
     //ensure debug switch was initialized closed on every onLoad
-    cache.set('debug-hotkey-switch', 0)
+    // cache.set('debug-hotkey-switch', 0)
 
     let hotkeySetting = getDebugHotkey();
     if (hotkeySetting == "") return
@@ -344,21 +344,27 @@ function initDebugHotKey() {
     }
 
     let bindResult = hotkey.bind(hotkeySetting.split("+"), () => {
+        //debug mode only available in expert mode
+        const identifier = here.pluginIdentifier()
+        if (!getExpertMode()) {
+            here.systemNotification("【🐞DEBUG模式开启失败】", `必须开启 ${identifier} 的高级模式后才可以使用`)
+            return false
+        }
         debug('|DEBUG_MODE CHANGED|', false, true)
         debug(`Before: ${cache.get('debug-hotkey-switch')}`)
         //Toggle Debug hotkey, implement use a simple cache switch
         const debugSwitch = cache.get('debug-hotkey-switch')
-        const identifier = here.pluginIdentifier()
+
         if (debugSwitch != undefined && _.toSafeInteger(debugSwitch) == 1) {
             here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 已关闭 DEBUG 模式`)
             cache.set('debug-hotkey-switch', 0)
             debug('After: 0')
         } else {
         here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
-1. 每次重启或者 reload，缓存会清空
+1. 在高级设置下面会有 Debug 菜单
 2. 帖子标题增加 POST_ID 方便追溯
 `)
-            cache.removeAll()
+            // cache.removeAll()
             //ensure debug switch exists
             cache.set('debug-hotkey-switch', 1)
             debug('After: 1')
