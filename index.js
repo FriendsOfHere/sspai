@@ -5,9 +5,10 @@ const net = require("net")
 const pref = require("pref")
 const i18n = require("i18n")
 const http = require('http')
+const pb = require('pasteboard')
 
-const {getPostId, getUnreadFeeds, getMatrixData, getHomepageData} = require('./sspai.js')
-const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, debug} = require('./tool.js')
+const {getPostId, getUnreadFeeds, getFeedsWithRead, getMatrixData, getHomepageData} = require('./sspai.js')
+const {getUpdateFrequency, getFetchArticleNum, getMenuBarStyleName, isDebugMode, isUnreadNotifyOpen, getDebugHotkey, getExpertMode, debug} = require('./tool.js')
 
 function updateData() {
     debug(__("update data starting"), true)
@@ -65,32 +66,33 @@ function updateData() {
             }
             debug(`toRenderSize. matrix:${matrixData.items.length} homepage:${homepageData.items.length}`)
 
-            //init read list cache
-            let cachedPostIds = cache.get('readIds');
-            if (cachedPostIds == undefined) {
-                debug("🚀 已读列表初始化缓存")
-                cache.set('readIds', []);
-            } else {
-                cachedPostIds = JSON.parse(cachedPostIds);
-                const checkUnreadFeedsNum = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), cachedPostIds).length
-                debug("unread total: " + checkUnreadFeedsNum)
-                //unread notify
-                if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
-                    //when in debug mode, system notifications will be conflicted
-                    //delay the unread notification for seconds later
-                    _.delay((unreadNum) => {
-                        here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
-                    }, isDebugMode() ? 5000 : 1000);
-                }
+            const cachedPostIds = JSON.parse(cache.get('readIds') || '[]');
+            const checkUnreadFeedsNum = getUnreadFeeds(
+                (getShowExpertSpecificSwitch('index-channel', true)
+                    ? _.concat(matrixData.items, homepageData.items)
+                    : matrixData.items),
+                cachedPostIds).length
+            debug("unread total: " + checkUnreadFeedsNum)
+            //unread notify
+            if (checkUnreadFeedsNum > 0 && IS_UNREAD_NOTIFY_OPEN) {
+                //when in debug mode, system notifications will be conflicted
+                //delay the unread notification for seconds later
+                _.delay((unreadNum) => {
+                    here.systemNotification("【少数派有新的文章更新啦】", `未读数 ${checkUnreadFeedsNum}`)
+                }, isDebugMode() ? 5000 : 1000);
             }
 
             // render component
             let renderComponent = () => {
-                let readIds = JSON.parse(cache.get('readIds'));
+                let readIds = JSON.parse(cache.get('readIds') || '[]');
                 debug(`cachedIDs:${JSON.stringify(readIds)}`)
 
                 //TOP Feed set......
-                let unreadFeeds = getUnreadFeeds(_.concat(matrixData.items, homepageData.items), readIds)
+                const unreadFeeds = getUnreadFeeds(
+                    (getShowExpertSpecificSwitch('index-channel', true)
+                    ? _.concat(matrixData.items, homepageData.items)
+                    : matrixData.items),
+                    readIds)
                 let topFeed = _.head(unreadFeeds)
                 debug(`topFeed: ${topFeed != undefined ? topFeed.title : ""}`)
                 here.miniWindow.set({
@@ -127,8 +129,9 @@ function updateData() {
                 let matrixKey = __("Matrix")
                 let homepageKey = __("Homepage")
                 const tabRawData = {
-                    [matrixKey]: getUnreadFeeds(matrixData.items, readIds),
-                    [homepageKey]: getUnreadFeeds(homepageData.items, readIds),
+                    [matrixKey]: getRenderedData(matrixData.items, readIds),
+                    ...(getShowExpertSpecificSwitch('index-channel', true))
+                        && {[homepageKey]: getRenderedData(homepageData.items, readIds)},
                 }
                 // console.log(tabRawData)
                 const tabData = _.map(tabRawData, (val, key) => {
@@ -138,6 +141,106 @@ function updateData() {
                         "data": formatTabData(val, readIds)
                     }
                 })
+
+                //expert mode tab
+                if (getExpertMode()) {
+                    let expertModeConfig = JSON.parse(cache.get('expert') || '{}')
+                    console.log("avatar switch: " + getShowExpertSpecificSwitch('avatar', true))
+                    console.log("read switch: " + getShowExpertSpecificSwitch('read', false))
+                    console.log("index-channel switch: " + getShowExpertSpecificSwitch('index-channel', true))
+                    let expertModeTab = {
+                        "title": "⚙️高级设置🤫",
+                        "data": [
+                            {
+                                title: "=================展示配置================="
+                            },
+                            {
+                                title: "是否展示作者头像",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-avatar",
+                                    isOn: getShowExpertSpecificSwitch('avatar', true),
+                                    onValueChange: (isOn) => {
+                                        console.log(`accessory-avatar isOn: ${isOn}`);
+                                        expertModeConfig['avatar'] = isOn ? true : false
+                                        // console.log(expertModeConfig)
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
+                                        here.popover.update(`#accessory-avatar.isOn`, isOn)
+                                        here.hudNotification(`avatar switch is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                            {
+                                title: "是否展示已读文章",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-read",
+                                    isOn: getShowExpertSpecificSwitch('read', false),
+                                    onValueChange: (isOn) => {
+                                        console.log(`read isOn: ${isOn}`);
+                                        expertModeConfig['read'] = isOn ? true : false
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
+                                        here.popover.update(`#accessory-read.isOn`, isOn)
+                                        here.hudNotification(`read post switch is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                            {
+                                title: "是否展示[首页]频道",
+                                accessory: new here.SwitchAccessory({
+                                    id: "accessory-index-channel",
+                                    isOn: getShowExpertSpecificSwitch('index-channel', true),
+                                    onValueChange: (isOn) => {
+                                        console.log(`index channel isOn: ${isOn}`);
+                                        expertModeConfig['index-channel'] = isOn ? true : false
+                                        cache.set('expert', expertModeConfig)
+                                        console.log(cache.get('expert'))
+                                        here.popover.update(`#accessory-index-channel.isOn`, isOn)
+                                        here.hudNotification(`index channel switch is ${isOn ? "On" : "Off"}.`);
+                                    }
+                                }),
+                            },
+                        ]
+                    }
+                    if (isDebugMode()) {
+                        let debugLineData = [
+                            {
+                                title: "=================DEBUG================="
+                            },
+                            {
+                                title: "一键清除缓存",
+                                accessory: new here.MainTextAccessory({
+                                    title: "谨慎使用",
+                                }),
+                                onClick: () => {
+                                    cache.removeAll()
+                                    here.hudNotification("Cache info cleared.");
+                                    //reset debug mode setting
+                                    cache.set('debug-hotkey-switch', 1)
+                                }
+                            },
+                            {
+                                title: "一键复制缓存信息",
+                                onClick: () => {
+                                    pb.setText(JSON.stringify(cache.all()));
+                                    here.hudNotification("Cache info copied.");
+                                }
+                            },
+                            {
+                                title: "一键清除已读",
+                                onClick: () => {
+                                    cache.remove("readIds")
+                                    here.hudNotification("Read cache cleared.");
+                                }
+                            },
+                        ]
+
+                        let mergeData = expertModeTab.data
+                        mergeData.push(...debugLineData)
+                    }
+                    tabData.push(expertModeTab)
+                }
+
                 // console.log("tabData:" + JSON.stringify(tabData))
                 here.popover = new here.TabPopover(tabData);
                 here.popover.reload()
@@ -147,7 +250,7 @@ function updateData() {
                 // const stylePath = "./menubar/" + getMenuBarStyleName();
                 // debug("menubar style path: " + stylePath);
                 here.menuBar.set({
-                  title: `(${unreadFeeds.length})`,
+                  title: ` ${unreadFeeds.length}`,
                   icon: stylePath,
                 })
                 // here.menuBar.setIcon(stylePath);
@@ -156,7 +259,7 @@ function updateData() {
 
                 //dock component display
                 here.dock.set({
-                    title: unreadFeeds.length.toString(),
+                    title: `${unreadFeeds.length}`,
                     detail: "少数派更新"
                 })
                 here.dock.reload()
@@ -182,6 +285,20 @@ function updateData() {
         })
 }
 
+function getShowExpertSpecificSwitch(switchName, notExistsDefaultValue) {
+    const expertModeConfig = JSON.parse(cache.get('expert') || '{}')
+    if (_.isEmpty(expertModeConfig) || expertModeConfig[switchName] == undefined) return notExistsDefaultValue
+    return expertModeConfig[switchName]
+}
+
+function getRenderedData(feeds, readIds) {
+    const readSwitch = getShowExpertSpecificSwitch('read', false)
+    if (readSwitch) {
+        return getFeedsWithRead(feeds, readIds)
+    }
+    return getUnreadFeeds(feeds, readIds)
+}
+
 function formatTabData(rawUnreadFeeds, readIds) {
     // console.log(rawUnreadFeeds)
     if (_.isEmpty(rawUnreadFeeds)) {
@@ -189,10 +306,16 @@ function formatTabData(rawUnreadFeeds, readIds) {
     }
     return _.map(rawUnreadFeeds, (item, index) => {
         // console.log("item detail" + JSON.stringify(item))
+        // console.log("item avatar: " + item.avatar)
         return {
             title: isDebugMode()
                 ? `${index + 1}. ${item.title} PID:${getPostId(item.link)}`
                 : `${index + 1}. ${item.title}`,
+            accessory: {
+                title: "",
+                ...(getShowExpertSpecificSwitch('avatar', true)) && {imageURL: `${item.avatar}`},
+                ...(getShowExpertSpecificSwitch('avatar', true)) && {imageCornerRadius: 4}
+            },
             onClick: () => {
                 if (item.link != undefined) {
                     let postId = getPostId(item.link);
@@ -217,7 +340,7 @@ function formatTabData(rawUnreadFeeds, readIds) {
 
 function initDebugHotKey() {
     //ensure debug switch was initialized closed on every onLoad
-    cache.set('debug-hotkey-switch', 0)
+    // cache.set('debug-hotkey-switch', 0)
 
     let hotkeySetting = getDebugHotkey();
     if (hotkeySetting == "") return
@@ -230,21 +353,27 @@ function initDebugHotKey() {
     }
 
     let bindResult = hotkey.bind(hotkeySetting.split("+"), () => {
+        //debug mode only available in expert mode
+        const identifier = here.pluginIdentifier()
+        if (!getExpertMode()) {
+            here.systemNotification("【🐞DEBUG模式开启失败】", `必须开启 ${identifier} 的高级模式后才可以使用`)
+            return false
+        }
         debug('|DEBUG_MODE CHANGED|', false, true)
         debug(`Before: ${cache.get('debug-hotkey-switch')}`)
         //Toggle Debug hotkey, implement use a simple cache switch
         const debugSwitch = cache.get('debug-hotkey-switch')
-        const identifier = here.pluginIdentifier()
+
         if (debugSwitch != undefined && _.toSafeInteger(debugSwitch) == 1) {
             here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 已关闭 DEBUG 模式`)
             cache.set('debug-hotkey-switch', 0)
             debug('After: 0')
         } else {
         here.systemNotification("【🐞DEBUG模式】", `当前 ${identifier} 处于 DEBUG 模式
-1. 每次重启或者 reload，缓存会清空
+1. 在高级设置下面会有 Debug 菜单
 2. 帖子标题增加 POST_ID 方便追溯
 `)
-            cache.removeAll()
+            // cache.removeAll()
             //ensure debug switch exists
             cache.set('debug-hotkey-switch', 1)
             debug('After: 1')

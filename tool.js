@@ -1,3 +1,8 @@
+function isBlank(value) {
+    return _.isEmpty(value) && !_.isNumber(value) || _.isNaN(value)
+}
+_.mixin({ isBlank })
+
 module.exports = {
     getUpdateFrequency: () => {
         const DEFAULT_MIN_FREQUENCY = 2
@@ -42,6 +47,9 @@ module.exports = {
     },
     getDebugHotkey: () => {
         return pref.get("debug-hotkey")
+    },
+    getExpertMode: () => {
+        return pref.get("expert-mode")
     },
     debug: (log, isMainFlow = false, override = false) => {
         let span = ""
