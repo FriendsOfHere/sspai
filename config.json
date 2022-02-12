@@ -1,6 +1,6 @@
 {
    "name": "少数派",
-   "version": "1.4.1",
+   "version": "1.5.0",
    "configURL": "https://raw.githubusercontent.com/FriendsOfHere/sspai/master/config.json",
    "downloadURL": "https://github.com/FriendsOfHere/sspai/releases/latest/download/SSPai.hereplugin",
    "description": "展示少数派最新文章",
