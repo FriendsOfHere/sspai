@@ -215,6 +215,8 @@ function updateData() {
                                 onClick: () => {
                                     cache.removeAll()
                                     here.hudNotification("Cache info cleared.");
+                                    //reset debug mode setting
+                                    cache.set('debug-hotkey-switch', 1)
                                 }
                             },
                             {
